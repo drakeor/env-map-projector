@@ -6,8 +6,19 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 add_subdirectory(lib/Catch2)
 
-add_executable (envmapproj src/main.cpp)
+set(SourceFiles src/ImageReader.cpp src/EnvMapImage.cpp)
 
-add_executable (envmapproj_tests tests/test_main.cpp)
+add_executable (envmapproj 
+    src/main.cpp 
+    ${SourceFiles}
+)
+
+add_executable (envmapproj_tests 
+    tests/test_main.cpp 
+    tests/ImageReaderTests.cpp 
+    tests/EnvMapImageTests.cpp 
+    ${SourceFiles}
+)
+
 target_link_libraries(envmapproj_tests PRIVATE Catch2::Catch2WithMain)
 file(COPY assets DESTINATION bin)
