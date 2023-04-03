@@ -6,7 +6,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 add_subdirectory(lib/Catch2)
 
-set(SourceFiles src/ImageReader.cpp src/EnvMapImage.cpp)
+set(SourceFiles src/ImageReader.cpp src/EnvMapImage.cpp src/CoordsContainer2d.cpp)
 
 add_executable (envmapproj 
     src/main.cpp 
@@ -17,6 +17,7 @@ add_executable (envmapproj_tests
     tests/test_main.cpp 
     tests/ImageReaderTests.cpp 
     tests/EnvMapImageTests.cpp 
+    tests/CoordsContainer2dTests.cpp
     ${SourceFiles}
 )
 
