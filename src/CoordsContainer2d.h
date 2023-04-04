@@ -1,6 +1,7 @@
 #ifndef _COORDS_CONTAINER2D_H_
 #define _COORDS_CONTAINER2D_H_
 
+#include "Point2d.h"
 #include "PointCloud2d.h"
 #include "../lib/nanoflann/include/nanoflann.hpp"
 
@@ -22,6 +23,7 @@ public:
     // Slowest way to add. Should add in chunks versus resizing the vector
     // all the time
     void AddPoint(float x, float y, unsigned int value);
+    Point2d<float> GetClosestPoint(float x, float y);
 
 private:
     PointCloud2d<float> cloud;

@@ -5,18 +5,14 @@
 #include <iostream>
 #include <vector>
 
+#include "Point2d.h"
+
 template <typename T>
 struct PointCloud2d
 {
-    struct Point2d
-    {
-        T x, y;
-        unsigned int pixelValue;
-    };
-
     using coord_t = T;  //!< The type of each coordinate
 
-    std::vector<Point2d> pts;
+    std::vector<Point2d<T>> pts;
 
     // Must return the number of data points
     inline size_t kdtree_get_point_count() const { return pts.size(); }
