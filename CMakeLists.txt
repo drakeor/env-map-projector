@@ -6,7 +6,12 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 add_subdirectory(lib/Catch2)
 
-set(SourceFiles src/ImageReader.cpp src/EnvMapImage.cpp src/CoordsContainer2d.cpp)
+set(SourceFiles 
+    src/CoordsContainer2d.cpp
+    src/ImageReader.cpp 
+    src/EnvMapImage.cpp 
+    src/EquirectangularProjection.cpp
+)
 
 add_executable (envmapproj 
     src/main.cpp 

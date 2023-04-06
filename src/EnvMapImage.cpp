@@ -59,3 +59,4 @@ unsigned int EnvMapImage::GetPixel(int x, int y)
 
     return pixel;
 }
+

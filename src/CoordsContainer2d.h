@@ -23,7 +23,8 @@ public:
     // Slowest way to add. Should add in chunks versus resizing the vector
     // all the time
     void AddPoint(float x, float y, unsigned int value);
-    Point2d<float> GetClosestPoint(float x, float y);
+    void Empty();
+    Point2df GetClosestPoint(float x, float y);
 
 private:
     PointCloud2d<float> cloud;

@@ -22,7 +22,17 @@ void CoordsContainer2d::AddPoint(float x, float y, unsigned int value)
     index.addPoints(cloud.pts.size()-1, cloud.pts.size()-1);
 }
 
-Point2d<float> CoordsContainer2d::GetClosestPoint(float x, float y)
+void CoordsContainer2d::Empty()
+{
+    for(int i = 0; i < cloud.pts.size(); i++)
+    {
+        index.removePoint(i);
+    }
+    cloud.pts.clear();
+}
+
+
+Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
 {
 
     float query_pt[2] = {x, y};
