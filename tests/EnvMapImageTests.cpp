@@ -25,6 +25,26 @@ TEST_CASE( "EnvMapImage", "[env-map-image]" ) {
         ImageReader imageReader;
         EnvMapImage imageData = imageReader.LoadImage("assets/testimages/pixel_map_test.png");
 
+
+        REQUIRE( imageData.IsValid() );
+        REQUIRE( imageData.GetWidth() == 100);
+        REQUIRE( imageData.GetHeight() == 100);
+
+        REQUIRE( imageData.GetPixel(0,0) == 0xFF0000FF);
+        REQUIRE( imageData.GetPixel(1,0) == 0xFF0000FF);
+        REQUIRE( imageData.GetPixel(2,0) == 0xFF0000FF);
+
+        REQUIRE( imageData.GetPixel(2,10) == 0xFF0000FF);
+        imageData.SetPixel(2, 10, 0xAABBCCDD);
+        REQUIRE( imageData.GetPixel(2, 10) == 0xAABBCCDD);
+    }
+
+
+    SECTION( "loaded image pixel check" ) {
+
+        ImageReader imageReader;
+        EnvMapImage imageData = imageReader.LoadImage("assets/testimages/pixel_map_test.png");
+
         /*std::cout << std::endl;
         for(int i = 0; i < imageData.GetWidth(); i++)
         {

@@ -9,6 +9,7 @@ add_subdirectory(lib/Catch2)
 set(SourceFiles 
     src/CoordsContainer2d.cpp
     src/ImageReader.cpp 
+    src/ImageWriter.cpp 
     src/EnvMapImage.cpp 
     src/EquirectangularProjection.cpp
 )
@@ -24,6 +25,7 @@ add_executable (envmapproj_tests
     tests/EnvMapImageTests.cpp 
     tests/EquirectangularProjectionTests.cpp 
     tests/ImageReaderTests.cpp 
+    tests/ImageWriterTests.cpp
     ${SourceFiles}
 )
 

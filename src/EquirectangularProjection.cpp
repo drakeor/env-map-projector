@@ -1,6 +1,6 @@
 #include "EquirectangularProjection.h"
 
-const double pi = 3.14159265358979323846;
+const float pi = 3.14159265358979323846f;
 
 EquirectangularProjection::EquirectangularProjection()
 {
@@ -28,7 +28,7 @@ void EquirectangularProjection::LoadImageToSphericalCoords(EnvMapImage* image)
             // Coordinates are stored internally as spherical coordinates
             // Convert and add to our coordinate collection
             auto sphericalPt = UVToSpherical({u, v, pixelData});
-            coords.AddPoint(u, v, pixelData);
+            coords.AddPoint(sphericalPt.x, sphericalPt.y, pixelData);
         }
     }
 }
@@ -53,7 +53,7 @@ EnvMapImage EquirectangularProjection::ConvertToImage(int width, int height)
             unsigned int pixelData = pointData.pixelValue;
 
             // Set pixel in the final UV image
-            newImage.SetPixel(u, v, pixelData);
+            newImage.SetPixel(i, j, pixelData);
         }
     }
 

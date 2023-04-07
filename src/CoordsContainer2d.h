@@ -5,6 +5,8 @@
 #include "PointCloud2d.h"
 #include "../lib/nanoflann/include/nanoflann.hpp"
 
+//#define DEBUG_KD_TREE_OUTPUT
+
 //  KD-Tree index
 // TODO: Instead of L2_Simple_Adaptor, we would want to eventually choose
 // something for spherical coordinates too.

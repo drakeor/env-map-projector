@@ -43,6 +43,8 @@ Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
     resultSet.init(&ret_index, &out_dist_sqr);
     index.findNeighbors(resultSet, query_pt, {10});
 
+#ifdef DEBUG_KD_TREE_OUTPUT
+    std::cout << "input point (" << x << "," << y << ")" << std::endl;
     std::cout << "knnSearch(nn=" << num_results << "): \n";
     std::cout << "ret_index=" << ret_index
                 << " out_dist_sqr=" << out_dist_sqr << std::endl;
@@ -51,6 +53,7 @@ Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
                 << cloud.pts[ret_index].y
                 << ")" << std::endl;
     std::cout << std::endl;
+#endif
 
     return cloud.pts[ret_index];
 }

@@ -21,6 +21,8 @@ public:
     unsigned int GetPixel(int x, int y);
     void SetPixel(int x, int y, unsigned int pixelValue);
 
+    std::shared_ptr<unsigned char> GetData();
+
 private:
     int width;
     int height;

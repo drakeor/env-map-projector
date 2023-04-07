@@ -79,8 +79,13 @@ void EnvMapImage::SetPixel(int x, int y, unsigned int pixelValue)
 
     // Set the image data appropiately
     int index = y * width * 4 + x * 4;
-    data.get()[index]   = (pixelValue >> 24) && 0xFF;
-    data.get()[index+1] = (pixelValue >> 16) && 0xFF;
-    data.get()[index+2] = (pixelValue >> 8) && 0xFF;
-    data.get()[index+3] = pixelValue && 0xFF;
+    data.get()[index]   = (pixelValue >> 24) & 0xFF;
+    data.get()[index+1] = (pixelValue >> 16) & 0xFF;
+    data.get()[index+2] = (pixelValue >> 8) & 0xFF;
+    data.get()[index+3] = pixelValue & 0xFF;
+}
+
+std::shared_ptr<unsigned char> EnvMapImage::GetData()
+{
+    return data;
 }
