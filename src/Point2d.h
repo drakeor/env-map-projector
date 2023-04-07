@@ -8,6 +8,6 @@ struct Point2d
     unsigned int pixelValue;
 };
 
-typedef Point2d<float> Point2df;
+using Point2df = Point2d<float>;
 
 #endif
