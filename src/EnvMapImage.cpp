@@ -11,6 +11,14 @@ EnvMapImage::EnvMapImage(int _width, int _height,
     dataSize = _dataSize;
 }
 
+EnvMapImage::EnvMapImage(int _width, int _height)
+{
+    width = _width;
+    height = _height;
+    dataSize = _width * _height * 4;
+    data = std::shared_ptr<unsigned char>(new unsigned char[dataSize]);
+}
+
 EnvMapImage::~EnvMapImage()
 {
 
@@ -49,7 +57,6 @@ unsigned int EnvMapImage::GetPixel(int x, int y)
         return pixel;
 
     // Grab the pixel
-    //int index = (y * width + x) * 4;
     int index = y * width * 4 + x * 4;
     pixel = 
         (data.get()[index] << 24)
@@ -60,3 +67,20 @@ unsigned int EnvMapImage::GetPixel(int x, int y)
     return pixel;
 }
 
+void EnvMapImage::SetPixel(int x, int y, unsigned int pixelValue)
+{
+    // Sanity checking
+    if(data.get() == nullptr)
+        return;
+
+    // Bounds checking
+    if(x < 0 || y < 0 || x >= width || y >= height)
+        return;
+
+    // Set the image data appropiately
+    int index = y * width * 4 + x * 4;
+    data.get()[index]   = (pixelValue >> 24) && 0xFF;
+    data.get()[index+1] = (pixelValue >> 16) && 0xFF;
+    data.get()[index+2] = (pixelValue >> 8) && 0xFF;
+    data.get()[index+3] = pixelValue && 0xFF;
+}
