@@ -12,6 +12,7 @@ set(SourceFiles
     src/ImageWriter.cpp 
     src/EnvMapImage.cpp 
     src/EquirectangularProjection.cpp
+    src/SkyboxProjection.cpp
 )
 
 add_executable (envmapproj 
@@ -26,6 +27,7 @@ add_executable (envmapproj_tests
     tests/EquirectangularProjectionTests.cpp 
     tests/ImageReaderTests.cpp 
     tests/ImageWriterTests.cpp
+    tests/SkyboxProjectionTests.cpp
     ${SourceFiles}
 )
 
