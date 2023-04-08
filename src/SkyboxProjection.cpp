@@ -57,9 +57,9 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 Eigen::Vector3f p = f(Pmat*D*X);
 
                 // Crappy way fix a certain axis to the offset amount
-                if(Pmat(2, 0) == 1)
+                if(Pmat(0, 2) == 1)
                     p(0) = offset;
-                if(Pmat(2, 1) == 1)
+                if(Pmat(1, 2) == 1)
                     p(1) = offset;
                 if(Pmat(2, 2) == 1)
                     p(2) = offset;
@@ -98,7 +98,7 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 1, 0, 0,
                 0, 1, 0;
         uvToCoord(P2, 1, backImage);
-        uvToCoord(P2, -1, frontImage);
+        //uvToCoord(P2, -1, frontImage);
     }
 
     // Do the left and right images
