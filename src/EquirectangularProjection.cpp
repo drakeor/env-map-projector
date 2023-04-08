@@ -21,8 +21,8 @@ void EquirectangularProjection::LoadImageToSphericalCoords(EnvMapImage* image)
         for(int j = 0; j < image->GetHeight(); j++)
         {
             // Convert to UV coords. Domain: [0,1]
-            float u = (float)i / (float)(image->GetWidth());
-            float v = (float)j / (float)(image->GetHeight());
+            float u = (float)i / (float)(image->GetWidth()-1);
+            float v = (float)j / (float)(image->GetHeight()-1);
             unsigned int pixelData = image->GetPixel(i, j);
 
             // Coordinates are stored internally as spherical coordinates
@@ -44,8 +44,8 @@ EnvMapImage EquirectangularProjection::ConvertToImage(int width, int height)
         for(int j = 0; j < height; j++)
         {
             // Convert to UV coordinates. Domain: [0,1]
-            float u = (float)i / (float)(width);
-            float v = (float)j / (float)(height);
+            float u = (float)i / (float)(width-1);
+            float v = (float)j / (float)(height-1);
 
             // Coordinates are stored as Spherical, so convert and grab the closest point data
             auto sphericalPt = UVToSpherical({u, v, 0});
