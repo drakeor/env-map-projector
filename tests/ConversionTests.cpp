@@ -28,7 +28,7 @@ TEST_CASE( "ConversionTests", "[conversion-tests]" ) {
 
         EquirectangularProjection equiRectangularProj;
         auto newImg = equiRectangularProj.ConvertToImage(&coords,
-            400, 200);
+            400, 400);
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/skybox_to_equirect.png", newImg);

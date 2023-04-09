@@ -66,9 +66,9 @@ EnvMapImage EquirectangularProjection::ConvertToImage(CoordsContainer2d* coords,
 Point2df EquirectangularProjection::UVToSpherical(Point2df inputPt)
 {
     float theta = inputPt.x * pi;
-    inputPt.x = theta;
-
     float phi = inputPt.y * 2.0f * pi;
+
+    inputPt.x = theta;
     inputPt.y = phi;
     
     return inputPt;
@@ -77,9 +77,9 @@ Point2df EquirectangularProjection::UVToSpherical(Point2df inputPt)
 Point2df EquirectangularProjection::SphericalToUV(Point2df inputPt)
 {
     float u = inputPt.x / pi;
-    inputPt.x = u;
-
     float v = inputPt.y / (2.0f * pi);
+    
+    inputPt.x = u;
     inputPt.y = v;
     
     return inputPt;
