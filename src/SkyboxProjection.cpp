@@ -13,11 +13,12 @@ SkyboxProjection::~SkyboxProjection()
 }
 
 void SkyboxProjection::LoadImageToSphericalCoords(
+        CoordsContainer2d* coords,
         EnvMapImage* topImage, EnvMapImage* bottomImage, 
         EnvMapImage* leftImage, EnvMapImage* rightImage,
         EnvMapImage* frontImage, EnvMapImage* backImage)
 {
-    coords.Empty();
+    coords->Empty();
 #ifdef STORE_CARTESIAN_COORDS
     coordsCart.empty();
 #endif
@@ -45,6 +46,9 @@ void SkyboxProjection::LoadImageToSphericalCoords(
     // Converting UV to coords for a particular side
     auto uvToCoord = [&](Eigen::Matrix3f Pmat, float offset, EnvMapImage* image) {
         
+        // We only need to build this matrix once
+        Eigen::Matrix3f A = Pmat*D;
+
         for(int i = 0; i < image->GetWidth(); i++)
         {
             for(int j = 0; j < image->GetHeight(); j++)
@@ -56,15 +60,13 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,1] -> [x,y,z]
                 Eigen::Vector3f X(u, v, 0);
-                Eigen::Vector3f Y = f(Pmat*D*X);
+                Eigen::Vector3f Y = f(A*X);
 
-                // Crappy way fix a certain axis to the offset amount
-                if(Pmat(0, 2) == 1)
-                    Y(0) = offset;
-                if(Pmat(1, 2) == 1)
-                    Y(1) = offset;
-                if(Pmat(2, 2) == 1)
-                    Y(2) = offset;
+                // Column 3 holds which axis to fit to.
+                // To avoid passing another matrix operation, we set it this way.
+                for(int k = 0; k < 3; k++)
+                    if(Pmat(k, 2) == 1)
+                        Y(k) = offset;
 
                 //std::cout << p.z() << "," << std::endl;
                 //std::cout << "(" << p.x() << "," << p.y() << "," << p.z() << "), ";
@@ -75,11 +77,11 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 Point3df point;
                 point.x = Y.x();
                 point.y = Y.y();
-                point.z = Y.y();
+                point.z = Y.z();
                 point.pixelValue = pixelData;
 
                 auto newPoint = CartesianToSpherical(point);
-                coords.AddPoint(newPoint.x, newPoint.y, pixelData);
+                coords->AddPoint(newPoint.x, newPoint.y, pixelData);
             }
             //std::cout << std::endl;
         }
@@ -129,7 +131,8 @@ void SkyboxProjection::LoadImageToSphericalCoords(
 
 }
 
-EnvMapImage SkyboxProjection::ConvertToImageTop(int width, int height)
+EnvMapImage SkyboxProjection::ConvertToImageTop(CoordsContainer2d* coords,
+    int width, int height)
 {
     // Only output the top image
     EnvMapImage newImage(width, height);

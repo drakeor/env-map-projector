@@ -12,9 +12,10 @@ EquirectangularProjection::~EquirectangularProjection()
 
 }
 
-void EquirectangularProjection::LoadImageToSphericalCoords(EnvMapImage* image)
+void EquirectangularProjection::LoadImageToSphericalCoords(
+    CoordsContainer2d* coords, EnvMapImage* image)
 {
-    coords.Empty();
+    coords->Empty();
 
     for(int i = 0; i < image->GetWidth(); i++)
     {
@@ -28,12 +29,13 @@ void EquirectangularProjection::LoadImageToSphericalCoords(EnvMapImage* image)
             // Coordinates are stored internally as spherical coordinates
             // Convert and add to our coordinate collection
             auto sphericalPt = UVToSpherical({u, v, pixelData});
-            coords.AddPoint(sphericalPt.x, sphericalPt.y, pixelData);
+            coords->AddPoint(sphericalPt.x, sphericalPt.y, pixelData);
         }
     }
 }
 
-EnvMapImage EquirectangularProjection::ConvertToImage(int width, int height)
+EnvMapImage EquirectangularProjection::ConvertToImage(CoordsContainer2d* coords, 
+    int width, int height)
 {
     // TODO: We should error check that coords actually has points?
 
@@ -49,7 +51,7 @@ EnvMapImage EquirectangularProjection::ConvertToImage(int width, int height)
 
             // Coordinates are stored as Spherical, so convert and grab the closest point data
             auto sphericalPt = UVToSpherical({u, v, 0});
-            auto pointData = coords.GetClosestPoint(sphericalPt.x, sphericalPt.y);
+            auto pointData = coords->GetClosestPoint(sphericalPt.x, sphericalPt.y);
             unsigned int pixelData = pointData.pixelValue;
 
             // Set pixel in the final UV image
@@ -63,7 +65,7 @@ EnvMapImage EquirectangularProjection::ConvertToImage(int width, int height)
 
 Point2df EquirectangularProjection::UVToSpherical(Point2df inputPt)
 {
-    float theta = inputPt.x * 2 * pi;
+    float theta = inputPt.x * 2.0f * pi;
     inputPt.x = theta;
 
     float phi = inputPt.y * pi;
@@ -74,7 +76,7 @@ Point2df EquirectangularProjection::UVToSpherical(Point2df inputPt)
 
 Point2df EquirectangularProjection::SphericalToUV(Point2df inputPt)
 {
-    float u = inputPt.x / (2 * pi);
+    float u = inputPt.x / (2.0f * pi);
     inputPt.x = u;
 
     float v = inputPt.y / pi;

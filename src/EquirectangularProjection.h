@@ -13,8 +13,10 @@ public:
     EquirectangularProjection();
     ~EquirectangularProjection();
 
-    void LoadImageToSphericalCoords(EnvMapImage* image);
-    EnvMapImage ConvertToImage(int width, int height);
+    void LoadImageToSphericalCoords(CoordsContainer2d* coords, 
+        EnvMapImage* image);
+    EnvMapImage ConvertToImage(CoordsContainer2d* coords,
+        int width, int height);
 
     Point2df UVToSpherical(Point2df uvPoint);
     Point2df SphericalToUV(Point2df uvPoint);
