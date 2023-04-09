@@ -74,13 +74,11 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 coordsCart.push_back(Y);
 #endif
                 // Lastly, convert to spherical coordinates and store.
-                Point3df point;
-                point.x = Y.x();
-                point.y = Y.y();
-                point.z = Y.z();
-                point.pixelValue = pixelData;
 
-                auto newPoint = CartesianToSpherical(point);
+                auto newPoint = CartesianToSpherical({
+                    Y.x(), Y.y(), Y.z(),
+                    pixelData
+                });
                 coords->AddPoint(newPoint.x, newPoint.y, pixelData);
             }
             //std::cout << std::endl;
@@ -156,9 +154,11 @@ Point2df SkyboxProjection::CartesianToSpherical(Point3df point)
 {
     float r = sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
     float theta = acos(point.z/r);
-    float phi = sgnf(point.y) 
+    //float theta = atan2(sqrt(point.x * point.x + point.y * point.y), point.z);
+    float phi = atan2(point.y,point.x);
+    /*float phi = sgnf(point.y)
         * acos(point.x / sqrt(point.x * point.x + point.y * point.y));
-    
+    */
     // Note that we don't save r, because we force this point to be
     // on the unit sphere.
     Point2df newPoint;
