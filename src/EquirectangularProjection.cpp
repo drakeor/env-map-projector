@@ -51,7 +51,11 @@ EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coo
             float v = (float)j / (float)(height-1);
 
             // Coordinates are stored as Spherical, so convert and grab the closest point data
-            auto sphericalPt = UVToSpherical({u, v, 0});
+            Point2df uvPoint;
+            uvPoint.x = u;
+            uvPoint.y = v;
+
+            auto sphericalPt = UVToSpherical(uvPoint);
             auto pointData = coords->GetClosestPoint(sphericalPt.azimuth,
                 sphericalPt.elevation);
             unsigned int pixelData = pointData.pixelValue;
@@ -68,8 +72,8 @@ EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coo
 SpherePointf EquirectangularProjection::UVToSpherical(Point2df inputPt)
 {
     SpherePointf newPoint;
-    newPoint.azimuth = inputPt.x * 2.0f * pi;
-    newPoint.elevation = inputPt.y * pi;
+    newPoint.azimuth = (inputPt.x * 2.0f * pi) - pi;
+    newPoint.elevation = (inputPt.y * pi) - (pi/2);
     newPoint.pixelValue = inputPt.pixelValue;
 
     return newPoint;
@@ -78,8 +82,8 @@ SpherePointf EquirectangularProjection::UVToSpherical(Point2df inputPt)
 Point2df EquirectangularProjection::SphericalToUV(SpherePointf inputPt)
 {
     Point2df newPoint;
-    newPoint.x = inputPt.azimuth / (2.0f * pi);
-    newPoint.y = inputPt.elevation / pi;
+    newPoint.x = (inputPt.azimuth + pi) / (2.0f * pi);
+    newPoint.y = (inputPt.elevation + (pi/2))/ pi;
     newPoint.pixelValue = inputPt.pixelValue;
 
     return newPoint;

@@ -22,6 +22,39 @@ int main()
         &leftImg, &rightImg, &frontImg, &backImg);
 
     auto sphericalPoints = coords.GetAllPoints();
+
+
+    std::vector<Point3df> cartCoords;
+    for(int i = 0; i < sphericalPoints.size(); i++)
+    {
+        Point3df newPoint = proj.SphericalToCartesian(sphericalPoints[i]);
+        cartCoords.push_back(newPoint);
+    }
+
+/*
+    std::cout << "x = [";
+    for(int i = 0; i < cartCoords.size(); i++)
+    {
+        std::cout << cartCoords[i].x << ",";
+    }
+    std:: cout << "]" << std::endl << std::endl;
+
+    std::cout << "y = [";
+    for(int i = 0; i < cartCoords.size(); i++)
+    {
+        std::cout << cartCoords[i].y << ",";
+    }
+    std:: cout << "]" << std::endl << std::endl;
+
+    std::cout << "z = [";
+    for(int i = 0; i < cartCoords.size(); i++)
+    {
+        std::cout << cartCoords[i].z << ",";
+    }
+    std:: cout << "]" << std::endl << std::endl;
+*/
+
+    
     std::cout << "azim = [";
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
@@ -35,6 +68,7 @@ int main()
         std::cout << sphericalPoints[i].elevation << ",";
     }
     std:: cout << "]" << std::endl << std::endl;
+    
     
     return 0;
 }
