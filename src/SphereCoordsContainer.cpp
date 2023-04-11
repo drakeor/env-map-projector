@@ -1,28 +1,28 @@
-#include "CoordsContainer2d.h"
+#include "SphereCoordsContainer.h"
 
 #include <iostream>
 
-CoordsContainer2d::CoordsContainer2d()
+SphereCoordsContainer::SphereCoordsContainer()
     : index(2, cloud, { 10 })
 {
 
 }
 
-CoordsContainer2d::~CoordsContainer2d()
+SphereCoordsContainer::~SphereCoordsContainer()
 {
 
 }
 
-void CoordsContainer2d::AddPoint(float x, float y, unsigned int value)
+void SphereCoordsContainer::AddPoint(float azim, float elev, unsigned int value)
 {
     // This is probably inefficient
     cloud.pts.push_back({
-        x, y, value
+        azim, elev, value
     });
     index.addPoints(cloud.pts.size()-1, cloud.pts.size()-1);
 }
 
-void CoordsContainer2d::Empty()
+void SphereCoordsContainer::Empty()
 {
     for(int i = 0; i < cloud.pts.size(); i++)
     {
@@ -31,16 +31,16 @@ void CoordsContainer2d::Empty()
     cloud.pts.clear();
 }
 
-std::vector<Point2d<float>> CoordsContainer2d::GetAllPoints()
+std::vector<SpherePoint<float>> SphereCoordsContainer::GetAllPoints()
 {
     return cloud.pts;
 }
 
 
-Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
+SpherePoint<float> SphereCoordsContainer::GetClosestPoint(float azim, float elev)
 {
 
-    float query_pt[2] = {x, y};
+    float query_pt[2] = {azim, elev};
     const size_t num_results = 1;
     size_t ret_index = 0;
     float out_dist_sqr = 0;
@@ -49,13 +49,13 @@ Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
     index.findNeighbors(resultSet, query_pt, {10});
 
 #ifdef DEBUG_KD_TREE_OUTPUT
-    std::cout << "input point (" << x << "," << y << ")" << std::endl;
+    std::cout << "input point (" << azim << "," << elev << ")" << std::endl;
     std::cout << "knnSearch(nn=" << num_results << "): \n";
     std::cout << "ret_index=" << ret_index
                 << " out_dist_sqr=" << out_dist_sqr << std::endl;
     std::cout << "point: ("
-                << "point: (" << cloud.pts[ret_index].x << ", "
-                << cloud.pts[ret_index].y
+                << "point: (" << cloud.pts[ret_index].azim << ", "
+                << cloud.pts[ret_index].elev
                 << ")" << std::endl;
     std::cout << std::endl;
 #endif

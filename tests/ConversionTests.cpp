@@ -1,6 +1,6 @@
 #include "../src/ImageReader.h"
 #include "../src/ImageWriter.h"
-#include "../src/CoordsContainer2d.h"
+#include "../src/SphereCoordsContainer.h"
 #include "../src/EquirectangularProjection.h"
 #include "../src/SkyboxProjection.h"
 #include <catch2/catch_test_macros.hpp>
@@ -10,7 +10,7 @@ TEST_CASE( "ConversionTests", "[conversion-tests]" ) {
 
     // KNN should initialize without erroring
     SECTION( "skybox to equirectangular" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         ImageReader reader;
 
         auto topImg = reader.LoadImage("assets/skybox_test_basic/top.png");

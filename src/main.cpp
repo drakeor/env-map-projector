@@ -1,10 +1,10 @@
-#include "CoordsContainer2d.h"
+#include "SphereCoordsContainer.h"
 #include "SkyboxProjection.h"
 #include "ImageReader.h"
 
 int main()
 {
-    CoordsContainer2d coords;
+    SphereCoordsContainer coords;
     SkyboxProjection proj;
     ImageReader reader;
 
@@ -22,17 +22,17 @@ int main()
         &leftImg, &rightImg, &frontImg, &backImg);
 
     auto sphericalPoints = coords.GetAllPoints();
-    std::cout << "theta = [";
+    std::cout << "azim = [";
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
-        std::cout << sphericalPoints[i].x << ",";
+        std::cout << sphericalPoints[i].azimuth << ",";
     }
     std:: cout << "]" << std::endl << std::endl;
 
-    std::cout << "phi = [";
+    std::cout << "evel = [";
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
-        std::cout << sphericalPoints[i].y << ",";
+        std::cout << sphericalPoints[i].elevation << ",";
     }
     std:: cout << "]" << std::endl << std::endl;
     

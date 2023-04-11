@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <vector>
-#include "CoordsContainer2d.h"
+#include "SphereCoordsContainer.h"
 #include "EnvMapImage.h"
 #include "Point2d.h"
+#include "SpherePoint.h"
 
 class EquirectangularProjection
 {
@@ -13,16 +14,16 @@ public:
     EquirectangularProjection();
     ~EquirectangularProjection();
 
-    void LoadImageToSphericalCoords(CoordsContainer2d* coords, 
+    void LoadImageToSphericalCoords(SphereCoordsContainer* coords, 
         EnvMapImage* image);
-    EnvMapImage ConvertToImage(CoordsContainer2d* coords,
+    EnvMapImage ConvertToImage(SphereCoordsContainer* coords,
         int width, int height);
 
-    Point2df UVToSpherical(Point2df uvPoint);
-    Point2df SphericalToUV(Point2df uvPoint);
+    SpherePointf UVToSpherical(Point2df uvPoint);
+    Point2df SphericalToUV(SpherePointf uvPoint);
 
 private:
-    CoordsContainer2d coords;
+    SphereCoordsContainer coords;
 };
 
 #endif

@@ -6,9 +6,9 @@
 
 #include "../lib/eigen/Eigen/Dense"
 
-#include "CoordsContainer2d.h"
+#include "SphereCoordsContainer.h"
 #include "EnvMapImage.h"
-#include "Point2d.h"
+#include "SpherePoint.h"
 #include "Point3d.h"
 
 // Flag to also stores the cartesian coordinates
@@ -23,18 +23,18 @@ public:
     ~SkyboxProjection();
 
     void LoadImageToSphericalCoords(
-        CoordsContainer2d* coords,
+        SphereCoordsContainer* coords,
         EnvMapImage* topImage, EnvMapImage* bottomImage, 
         EnvMapImage* leftImage, EnvMapImage* rightImage,
         EnvMapImage* frontImage, EnvMapImage* backImage);
         
-    EnvMapImage ConvertToImageTop(CoordsContainer2d* coords,
+    EnvMapImage ConvertToImageTop(SphereCoordsContainer* coords,
         int width, int height);
         
     std::vector<Eigen::Vector3f> GetCoordsCart();
 
-    Point2df CartesianToSpherical(Point3df point);
-    Point3df SphericalToCartesian(Point2df spherical);
+    SpherePoint<float> CartesianToSpherical(Point3df point);
+    Point3df SphericalToCartesian(SpherePoint<float> spherical);
 
 private:
     std::vector<Eigen::Vector3f> coordsCart;

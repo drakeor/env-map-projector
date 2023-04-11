@@ -13,7 +13,7 @@ SkyboxProjection::~SkyboxProjection()
 }
 
 void SkyboxProjection::LoadImageToSphericalCoords(
-        CoordsContainer2d* coords,
+        SphereCoordsContainer* coords,
         EnvMapImage* topImage, EnvMapImage* bottomImage, 
         EnvMapImage* leftImage, EnvMapImage* rightImage,
         EnvMapImage* frontImage, EnvMapImage* backImage)
@@ -79,7 +79,8 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                     Y.x(), Y.y(), Y.z(),
                     pixelData
                 });
-                coords->AddPoint(newPoint.x, newPoint.y, pixelData);
+                coords->AddPoint(newPoint.azimuth, 
+                    newPoint.elevation, pixelData);
             }
             //std::cout << std::endl;
         }
@@ -129,7 +130,7 @@ void SkyboxProjection::LoadImageToSphericalCoords(
 
 }
 
-EnvMapImage SkyboxProjection::ConvertToImageTop(CoordsContainer2d* coords,
+EnvMapImage SkyboxProjection::ConvertToImageTop(SphereCoordsContainer* coords,
     int width, int height)
 {
     // Only output the top image
@@ -143,38 +144,39 @@ std::vector<Eigen::Vector3f> SkyboxProjection::GetCoordsCart()
 }
 
 // Sign functions
+/*
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 template <typename T> float sgnf(T val) {
     return (T(0) < val) - (val < T(0));
-}
+}*/
 
-Point2df SkyboxProjection::CartesianToSpherical(Point3df point)
+SpherePoint<float> SkyboxProjection::CartesianToSpherical(Point3df point)
 {
-    float r = sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-    float theta = acos(point.z/r);
-    //float theta = atan2(sqrt(point.x * point.x + point.y * point.y), point.z);
-    float phi = atan2(point.y,point.x);
+    //float r = sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
+    //float theta = acos(point.z/r);
+    float azim = atan2(point.y, point.x);
+    float elev = atan2(point.z, sqrt(point.x * point.x + point.y * point.y));
     /*float phi = sgnf(point.y)
         * acos(point.x / sqrt(point.x * point.x + point.y * point.y));
     */
     // Note that we don't save r, because we force this point to be
     // on the unit sphere.
-    Point2df newPoint;
-    newPoint.x = theta;
-    newPoint.y = phi;
+    SpherePoint<float> newPoint;
+    newPoint.azimuth = azim;
+    newPoint.elevation = elev;
     newPoint.pixelValue = point.pixelValue;
     return newPoint;
 }
 
-Point3df SkyboxProjection::SphericalToCartesian(Point2df point)
+Point3df SkyboxProjection::SphericalToCartesian(SpherePoint<float> point)
 {
     // Remember that r=1 since everything is done against the unit sphere.
     Point3df newPoint;
-    newPoint.x = sin(point.x) * cos(point.y);
-    newPoint.y = sin(point.x) * sin(point.y);
-    newPoint.z = cos(point.x);
+    newPoint.x = cos(point.elevation) * cos(point.azimuth);
+    newPoint.y = cos(point.elevation) * sin(point.azimuth);
+    newPoint.z = sin(point.elevation);
     newPoint.pixelValue = point.pixelValue;
     return newPoint;
 }

@@ -1,6 +1,7 @@
 #include "../src/ImageReader.h"
 #include "../src/ImageWriter.h"
 #include "../src/SkyboxProjection.h"
+#include "../src/SpherePoint.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <cmath>
@@ -20,7 +21,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // load test image
     SECTION( "loading all" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
         auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
@@ -49,17 +50,17 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
         auto newPoint = proj.CartesianToSpherical(point);
         
         REQUIRE( newPoint.pixelValue == point.pixelValue );
-        REQUIRE( (newPoint.x - 0.9553f) <  eps);
-        REQUIRE( (newPoint.y - 0.7854f) <  eps);
+        REQUIRE( (newPoint.azimuth - 0.9553f) <  eps);
+        REQUIRE( (newPoint.elevation - 0.7854f) <  eps);
     }
 
     // coordinate conversion to cartesian
     SECTION( "spherical to cartesian conversion" ) {
         SkyboxProjection proj;
 
-        Point2df point;
-        point.x = 0.9553f;
-        point.y = 0.7854f;
+        SpherePoint<float> point;
+        point.azimuth = 0.9553f;
+        point.elevation = 0.7854f;
         point.pixelValue = 0xAABBCCDD;
 
         auto newPoint = proj.SphericalToCartesian(point);
@@ -72,7 +73,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure top coordinates line up as expecting
     SECTION( "top cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
@@ -95,7 +96,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure bottom coordinates line up as expecting
     SECTION( "bottom cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
@@ -118,7 +119,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure left coordinates line up as expecting
     SECTION( "left cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
@@ -141,7 +142,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure right coordinates line up as expecting
     SECTION( "right cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
@@ -164,7 +165,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure front coordinates line up as expecting
     SECTION( "front cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
@@ -187,7 +188,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure back coordinates line up as expecting
     SECTION( "back cartesian coordinates testing" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 

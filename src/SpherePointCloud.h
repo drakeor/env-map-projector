@@ -1,18 +1,18 @@
-#ifndef _POINTCLOUD_H_
-#define _POINTCLOUD_H_
+#ifndef _SPHEREPOINTCLOUD_H_
+#define _SPHEREPOINTCLOUD_H_
 
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
-#include "Point2d.h"
+#include "SpherePoint.h"
 
 template <typename T>
-struct PointCloud2d
+struct SpherePointCloud
 {
     using coord_t = T;  //!< The type of each coordinate
 
-    std::vector<Point2d<T>> pts;
+    std::vector<SpherePoint<T>> pts;
 
     // Must return the number of data points
     inline size_t kdtree_get_point_count() const { return pts.size(); }
@@ -24,9 +24,9 @@ struct PointCloud2d
     inline T kdtree_get_pt(const size_t idx, const size_t dim) const
     {
         if (dim == 0)
-            return pts[idx].x;
+            return pts[idx].azimuth;
         else
-            return pts[idx].y;
+            return pts[idx].elevation;
     }
 
     // Optional bounding-box computation: return false to default to a standard
@@ -41,17 +41,5 @@ struct PointCloud2d
     }
 };
 
-template <typename T>
-void generateRandomPointCloud(
-    PointCloud2d<T>& point, const size_t N, const T max_range = 10)
-{
-    // Generating Random Point Cloud
-    point.pts.resize(N);
-    for (size_t i = 0; i < N; i++)
-    {
-        point.pts[i].x = max_range * (rand() % 1000) / T(1000);
-        point.pts[i].y = max_range * (rand() % 1000) / T(1000);
-    }
-}
 
 #endif

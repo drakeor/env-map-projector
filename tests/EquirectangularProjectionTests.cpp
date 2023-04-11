@@ -15,7 +15,7 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "loading" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
@@ -33,7 +33,7 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
         uvPoint.y = 0.834f;
         uvPoint.pixelValue = 0xAABBCCDD;
 
-        Point2df spherePoint = proj.UVToSpherical(uvPoint);
+        SpherePoint<float> spherePoint = proj.UVToSpherical(uvPoint);
         Point2df reformedUvPoint = proj.SphericalToUV(spherePoint);
 
         REQUIRE( abs(uvPoint.x - reformedUvPoint.x) <  epsilon);
@@ -44,7 +44,7 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "samesize" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
@@ -58,7 +58,7 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "upsize" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
@@ -72,7 +72,7 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "downsize" ) {
-        CoordsContainer2d coords;
+        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
