@@ -1,6 +1,8 @@
 #include "SphereCoordsContainer.h"
 #include "SkyboxProjection.h"
+#include "EquirectangularProjection.h"
 #include "ImageReader.h"
+#include "ImageWriter.h"
 
 int main()
 {
@@ -8,12 +10,12 @@ int main()
     SkyboxProjection proj;
     ImageReader reader;
 
-    auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
-    auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
-    auto leftImg = reader.LoadImage("assets/skybox_test_small/left.png");
-    auto rightImg = reader.LoadImage("assets/skybox_test_small/right.png");
-    auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
-    auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
+    auto topImg = reader.LoadImage("assets/skybox_test_basic/top.png");
+    auto bottomImg = reader.LoadImage("assets/skybox_test_basic/bottom.png");
+    auto leftImg = reader.LoadImage("assets/skybox_test_basic/left.png");
+    auto rightImg = reader.LoadImage("assets/skybox_test_basic/right.png");
+    auto frontImg = reader.LoadImage("assets/skybox_test_basic/front.png");
+    auto backImg = reader.LoadImage("assets/skybox_test_basic/back.png");
 
     SkyboxProjection skyboxProj;
     skyboxProj.LoadImageToSphericalCoords(
@@ -23,13 +25,20 @@ int main()
 
     auto sphericalPoints = coords.GetAllPoints();
 
+    EquirectangularProjection equiProj;
+    auto img = equiProj.ConvertToImage(&coords, 500, 250);
 
+    ImageWriter writer;
+    writer.SaveImage("converted_output.png", img);
+
+    /*
     std::vector<Point3df> cartCoords;
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
         Point3df newPoint = proj.SphericalToCartesian(sphericalPoints[i]);
         cartCoords.push_back(newPoint);
     }
+    */
 
 /*
     std::cout << "x = [";
@@ -54,7 +63,7 @@ int main()
     std:: cout << "]" << std::endl << std::endl;
 */
 
-    
+    /*
     std::cout << "azim = [";
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
@@ -68,7 +77,9 @@ int main()
         std::cout << sphericalPoints[i].elevation << ",";
     }
     std:: cout << "]" << std::endl << std::endl;
-    
+    */
+
+
     
     return 0;
 }
