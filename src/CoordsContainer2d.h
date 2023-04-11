@@ -28,6 +28,8 @@ public:
     void Empty();
     Point2df GetClosestPoint(float x, float y);
 
+    std::vector<Point2d<float>> GetAllPoints();
+
 private:
     PointCloud2d<float> cloud;
     my_kd_tree_t index;

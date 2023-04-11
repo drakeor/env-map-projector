@@ -31,6 +31,11 @@ void CoordsContainer2d::Empty()
     cloud.pts.clear();
 }
 
+std::vector<Point2d<float>> CoordsContainer2d::GetAllPoints()
+{
+    return cloud.pts;
+}
+
 
 Point2df CoordsContainer2d::GetClosestPoint(float x, float y)
 {
