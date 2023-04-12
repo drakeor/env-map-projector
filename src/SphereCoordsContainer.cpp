@@ -2,10 +2,11 @@
 
 #include <iostream>
 
-SphereCoordsContainer::SphereCoordsContainer()
+SphereCoordsContainer::SphereCoordsContainer(int requestedSize)
     : index(2, cloud, { 10 })
 {
-
+    cloud.pts.reserve(requestedSize);
+    allocatedSize = requestedSize;
 }
 
 SphereCoordsContainer::~SphereCoordsContainer()
@@ -13,22 +14,13 @@ SphereCoordsContainer::~SphereCoordsContainer()
 
 }
 
-void SphereCoordsContainer::AddPoint(float azim, float elev, unsigned int value)
+bool SphereCoordsContainer::AddPoint(int index, SpherePoint<float> point)
 {
-    // This is probably inefficient
-    cloud.pts.push_back({
-        azim, elev, value
-    });
-    index.addPoints(cloud.pts.size()-1, cloud.pts.size()-1);
-}
+    if(index < 0 || index >= allocatedSize)
+        return false;
 
-void SphereCoordsContainer::Empty()
-{
-    for(int i = 0; i < cloud.pts.size(); i++)
-    {
-        index.removePoint(i);
-    }
-    cloud.pts.clear();
+    cloud.pts[index] = point;
+    return true;
 }
 
 std::vector<SpherePoint<float>> SphereCoordsContainer::GetAllPoints()
@@ -36,6 +28,10 @@ std::vector<SpherePoint<float>> SphereCoordsContainer::GetAllPoints()
     return cloud.pts;
 }
 
+bool SphereCoordsContainer::IndexAllPoints()
+{
+    index.addPoints(0, cloud.pts.size());    
+}
 
 SpherePoint<float> SphereCoordsContainer::GetClosestPoint(float azim, float elev)
 {

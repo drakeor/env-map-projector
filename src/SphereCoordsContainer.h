@@ -19,19 +19,20 @@ using my_kd_tree_t = nanoflann::KDTreeSingleIndexDynamicAdaptor<
 class SphereCoordsContainer
 {
 public:
-    SphereCoordsContainer();
+    SphereCoordsContainer(int requestedSize);
     ~SphereCoordsContainer();
 
     // Slowest way to add. Should add in chunks versus resizing the vector
     // all the time
-    void AddPoint(float azim, float elev, unsigned int value);
-    void Empty();
+    bool AddPoint(int index, SpherePoint<float> point);
     SpherePoint<float> GetClosestPoint(float azim, float elev);
+    bool IndexAllPoints();
 
     std::vector<SpherePoint<float>> GetAllPoints();
 
 private:
     SpherePointCloud<float> cloud;
+    int allocatedSize;
     my_kd_tree_t index;
 };
 
