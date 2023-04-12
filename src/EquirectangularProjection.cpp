@@ -12,10 +12,16 @@ EquirectangularProjection::~EquirectangularProjection()
 
 }
 
-void EquirectangularProjection::LoadImageToSphericalCoords(
-    SphereCoordsContainer* coords, EnvMapImage* image)
+std::shared_ptr<SphereCoordsContainer> EquirectangularProjection::LoadImageToSphericalCoords(
+    EnvMapImage* image)
 {
-    coords->Empty();
+    int totalSize = (image->GetHeight() * image->GetWidth());
+
+    std::cout << "Attempting to allocate coordinate container of size "
+        << totalSize << std::endl;
+
+    std::shared_ptr<SphereCoordsContainer> coords = 
+        std::make_shared<SphereCoordsContainer>(totalSize);
 
     for(int i = 0; i < image->GetWidth(); i++)
     {
@@ -29,10 +35,11 @@ void EquirectangularProjection::LoadImageToSphericalCoords(
             // Coordinates are stored internally as spherical coordinates
             // Convert and add to our coordinate collection
             auto sphericalPt = UVToSpherical({u, v, pixelData});
-            coords->AddPoint(sphericalPt.azimuth, sphericalPt.elevation,
-                pixelData);
+            coords->AddPoint(sphericalPt);
         }
     }
+
+    return coords;
 }
 
 EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coords, 

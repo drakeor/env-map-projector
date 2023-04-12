@@ -21,7 +21,6 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // load test image
     SECTION( "loading all" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
         auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
@@ -31,8 +30,7 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
         auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
         auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
 
-        proj.LoadImageToSphericalCoords(
-            &coords, 
+        auto coords = proj.LoadImageToSphericalCoords(
             &topImg, &bottomImg,
             &leftImg, &rightImg, &frontImg, &backImg);
     }
@@ -73,12 +71,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure top coordinates line up as expecting
     SECTION( "top cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/top.png");
-        proj.LoadImageToSphericalCoords(&coords, &img, nullptr,
+        auto coords = proj.LoadImageToSphericalCoords(&img, nullptr,
             nullptr, nullptr, nullptr, nullptr);
 
         auto vect = proj.GetCoordsCart();
@@ -96,12 +93,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure bottom coordinates line up as expecting
     SECTION( "bottom cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/bottom.png");
-        proj.LoadImageToSphericalCoords(&coords, nullptr, &img,
+        auto coords = proj.LoadImageToSphericalCoords(nullptr, &img,
             nullptr, nullptr, nullptr, nullptr);
 
         auto vect = proj.GetCoordsCart();
@@ -119,12 +115,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure left coordinates line up as expecting
     SECTION( "left cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/left.png");
-        proj.LoadImageToSphericalCoords(&coords, nullptr, nullptr,
+        auto coords = proj.LoadImageToSphericalCoords(nullptr, nullptr,
             &img, nullptr, nullptr, nullptr);
 
         auto vect = proj.GetCoordsCart();
@@ -142,12 +137,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure right coordinates line up as expecting
     SECTION( "right cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/right.png");
-        proj.LoadImageToSphericalCoords(&coords, nullptr, nullptr,
+        auto coords = proj.LoadImageToSphericalCoords(nullptr, nullptr,
             nullptr, &img, nullptr, nullptr);
 
         auto vect = proj.GetCoordsCart();
@@ -165,12 +159,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure front coordinates line up as expecting
     SECTION( "front cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/front.png");
-        proj.LoadImageToSphericalCoords(&coords, nullptr, nullptr,
+        auto coords = proj.LoadImageToSphericalCoords(nullptr, nullptr,
             nullptr, nullptr, &img, nullptr);
 
         auto vect = proj.GetCoordsCart();
@@ -188,12 +181,11 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
 
     // make sure back coordinates line up as expecting
     SECTION( "back cartesian coordinates testing" ) {
-        SphereCoordsContainer coords;
         SkyboxProjection proj;
         ImageReader reader;
 
         auto img = reader.LoadImage("assets/skybox_test_small/back.png");
-        proj.LoadImageToSphericalCoords(&coords, nullptr, nullptr,
+        auto coords = proj.LoadImageToSphericalCoords(nullptr, nullptr,
             nullptr, nullptr, nullptr, &img);
 
         auto vect = proj.GetCoordsCart();

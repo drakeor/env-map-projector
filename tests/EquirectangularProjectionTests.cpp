@@ -15,11 +15,10 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "loading" ) {
-        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
-        proj.LoadImageToSphericalCoords(&coords, &img);
+        auto coords = proj.LoadImageToSphericalCoords(&img);
     }
 
     // UV To Spherical and back should be reversable.
@@ -44,13 +43,12 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "samesize" ) {
-        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
-        proj.LoadImageToSphericalCoords(&coords, &img);
+        auto coords = proj.LoadImageToSphericalCoords(&img);
         
-        auto newImg = proj.ConvertToImage(&coords, 200, 100);
+        auto newImg = proj.ConvertToImage(coords.get(), 200, 100);
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/test_samesize_equirect.png", newImg);
@@ -58,13 +56,12 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "upsize" ) {
-        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
-        proj.LoadImageToSphericalCoords(&coords, &img);
+        auto coords = proj.LoadImageToSphericalCoords(&img);
         
-        auto newImg = proj.ConvertToImage(&coords, 500, 220);
+        auto newImg = proj.ConvertToImage(coords.get(), 500, 220);
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/test_upsize_equirect.png", newImg);
@@ -72,13 +69,12 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
 
     // load test image
     SECTION( "downsize" ) {
-        SphereCoordsContainer coords;
         EquirectangularProjection proj;
         ImageReader reader;
         auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
-        proj.LoadImageToSphericalCoords(&coords, &img);
+        auto coords = proj.LoadImageToSphericalCoords(&img);
         
-        auto newImg = proj.ConvertToImage(&coords, 30, 20);
+        auto newImg = proj.ConvertToImage(coords.get(), 30, 20);
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/test_downsize_equirect.png", newImg);

@@ -10,7 +10,6 @@ TEST_CASE( "ConversionTests", "[conversion-tests]" ) {
 
     // KNN should initialize without erroring
     SECTION( "skybox to equirectangular" ) {
-        SphereCoordsContainer coords;
         ImageReader reader;
 
         auto topImg = reader.LoadImage("assets/skybox_test_basic/top.png");
@@ -21,13 +20,12 @@ TEST_CASE( "ConversionTests", "[conversion-tests]" ) {
         auto backImg = reader.LoadImage("assets/skybox_test_basic/back.png");
 
         SkyboxProjection skyboxProj;
-        skyboxProj.LoadImageToSphericalCoords(
-            &coords, 
+        auto coords = skyboxProj.LoadImageToSphericalCoords(
             &topImg, &bottomImg,
             &leftImg, &rightImg, &frontImg, &backImg);
 
         EquirectangularProjection equiRectangularProj;
-        auto newImg = equiRectangularProj.ConvertToImage(&coords,
+        auto newImg = equiRectangularProj.ConvertToImage(coords.get(),
             400, 400);
 
         ImageWriter writer;

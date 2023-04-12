@@ -22,8 +22,7 @@ public:
     SkyboxProjection();
     ~SkyboxProjection();
 
-    void LoadImageToSphericalCoords(
-        SphereCoordsContainer* coords,
+    std::shared_ptr<SphereCoordsContainer> LoadImageToSphericalCoords(
         EnvMapImage* topImage, EnvMapImage* bottomImage, 
         EnvMapImage* leftImage, EnvMapImage* rightImage,
         EnvMapImage* frontImage, EnvMapImage* backImage);

@@ -24,7 +24,7 @@ public:
 
     // Slowest way to add. Should add in chunks versus resizing the vector
     // all the time
-    bool AddPoint(int index, SpherePoint<float> point);
+    bool AddPoint(SpherePoint<float> point);
     SpherePoint<float> GetClosestPoint(float azim, float elev);
     bool IndexAllPoints();
 

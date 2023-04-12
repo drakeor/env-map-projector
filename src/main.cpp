@@ -6,27 +6,25 @@
 
 int main()
 {
-    SphereCoordsContainer coords;
     SkyboxProjection proj;
     ImageReader reader;
 
-    auto topImg = reader.LoadImage("assets/skybox_test_basic/top.png");
-    auto bottomImg = reader.LoadImage("assets/skybox_test_basic/bottom.png");
-    auto leftImg = reader.LoadImage("assets/skybox_test_basic/left.png");
-    auto rightImg = reader.LoadImage("assets/skybox_test_basic/right.png");
-    auto frontImg = reader.LoadImage("assets/skybox_test_basic/front.png");
-    auto backImg = reader.LoadImage("assets/skybox_test_basic/back.png");
+    auto topImg = reader.LoadImage("assets/skybox/top.jpg");
+    auto bottomImg = reader.LoadImage("assets/skybox/bottom.jpg");
+    auto leftImg = reader.LoadImage("assets/skybox/left.jpg");
+    auto rightImg = reader.LoadImage("assets/skybox/right.jpg");
+    auto frontImg = reader.LoadImage("assets/skybox/front.jpg");
+    auto backImg = reader.LoadImage("assets/skybox/back.jpg");
 
     SkyboxProjection skyboxProj;
-    skyboxProj.LoadImageToSphericalCoords(
-        &coords, 
+    auto coords = skyboxProj.LoadImageToSphericalCoords(
         &topImg, &bottomImg,
         &leftImg, &rightImg, &frontImg, &backImg);
 
-    auto sphericalPoints = coords.GetAllPoints();
+    auto sphericalPoints = coords->GetAllPoints();
 
     EquirectangularProjection equiProj;
-    auto img = equiProj.ConvertToImage(&coords, 500, 250);
+    auto img = equiProj.ConvertToImage(coords.get(), 500, 250);
 
     ImageWriter writer;
     writer.SaveImage("converted_output.png", img);

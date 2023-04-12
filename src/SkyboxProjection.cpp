@@ -1,4 +1,5 @@
 #include "SkyboxProjection.h"
+#include <memory>
 
 using namespace Eigen;
 
@@ -12,16 +13,28 @@ SkyboxProjection::~SkyboxProjection()
     
 }
 
-void SkyboxProjection::LoadImageToSphericalCoords(
-        SphereCoordsContainer* coords,
+std::shared_ptr<SphereCoordsContainer> SkyboxProjection::LoadImageToSphericalCoords(
         EnvMapImage* topImage, EnvMapImage* bottomImage, 
         EnvMapImage* leftImage, EnvMapImage* rightImage,
         EnvMapImage* frontImage, EnvMapImage* backImage)
 {
-    coords->Empty();
 #ifdef STORE_CARTESIAN_COORDS
     coordsCart.empty();
 #endif
+
+        int totalSize = 
+                (topImage->GetHeight() * topImage->GetWidth())
+            +   (bottomImage->GetHeight() * bottomImage->GetWidth())
+            +   (leftImage->GetHeight() * leftImage->GetWidth())
+            +   (rightImage->GetHeight() * rightImage->GetWidth())
+            +   (frontImage->GetHeight() * frontImage->GetWidth())
+            +   (backImage->GetHeight() * backImage->GetWidth());
+
+        std::cout << "Attempting to allocate coordinate container of size "
+            << totalSize << std::endl;
+
+        std::shared_ptr<SphereCoordsContainer> coords = 
+            std::make_shared<SphereCoordsContainer>(totalSize);
 
         // Defines how coordinates are oriented with respect to (u,v) coordinates.
         // This allows us to adapt to whatever direction the coordinates are.
@@ -60,7 +73,8 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,1] -> [x,y,z]
                 Eigen::Vector3f X(u, v, 0);
-                Eigen::Vector3f Y = f(A*X);
+                Eigen::Vector3f Y = A*X;
+                Y = f(Y);
 
                 // Column 3 holds which axis to fit to.
                 // To avoid passing another matrix operation, we set it this way.
@@ -74,13 +88,11 @@ void SkyboxProjection::LoadImageToSphericalCoords(
                 coordsCart.push_back(Y);
 #endif
                 // Lastly, convert to spherical coordinates and store.
-
                 auto newPoint = CartesianToSpherical({
                     Y.x(), Y.y(), Y.z(),
                     pixelData
                 });
-                coords->AddPoint(newPoint.azimuth, 
-                    newPoint.elevation, pixelData);
+                coords->AddPoint(newPoint);
             }
             //std::cout << std::endl;
         }
@@ -128,6 +140,7 @@ void SkyboxProjection::LoadImageToSphericalCoords(
             uvToCoord(P3, -1, leftImage);
     }
 
+    return coords;
 }
 
 EnvMapImage SkyboxProjection::ConvertToImageTop(SphereCoordsContainer* coords,

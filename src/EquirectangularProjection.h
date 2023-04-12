@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
+
 #include "SphereCoordsContainer.h"
 #include "EnvMapImage.h"
 #include "Point2d.h"
@@ -14,7 +16,7 @@ public:
     EquirectangularProjection();
     ~EquirectangularProjection();
 
-    void LoadImageToSphericalCoords(SphereCoordsContainer* coords, 
+    std::shared_ptr<SphereCoordsContainer> LoadImageToSphericalCoords(
         EnvMapImage* image);
     EnvMapImage ConvertToImage(SphereCoordsContainer* coords,
         int width, int height);
@@ -23,7 +25,6 @@ public:
     Point2df SphericalToUV(SpherePointf uvPoint);
 
 private:
-    SphereCoordsContainer coords;
 };
 
 #endif

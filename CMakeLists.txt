@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.0.2)
 project (EnvMapProjector)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
+set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(lib/Catch2)
 
