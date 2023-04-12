@@ -7,6 +7,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 add_subdirectory(lib/Catch2)
 
 set(SourceFiles 
+    src/Coords3dContainer.cpp
     src/ImageReader.cpp 
     src/ImageWriter.cpp 
     src/EnvMapImage.cpp 
