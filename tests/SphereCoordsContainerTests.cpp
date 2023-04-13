@@ -14,6 +14,7 @@ TEST_CASE( "CoordsContainer2d", "[coords-container-2d]" ) {
         SphereCoordsContainer coordsContainer(2);
         coordsContainer.AddPoint({1, 2, 0xFF00FF00});
         coordsContainer.AddPoint({2, 2, 0xFF00FF00});
+        coordsContainer.IndexAllPoints();
     }
 
     // Testing direct case of grabbing the closest point
@@ -23,6 +24,7 @@ TEST_CASE( "CoordsContainer2d", "[coords-container-2d]" ) {
         coordsContainer.AddPoint({1, 2, 0xFFAABBCC});
         coordsContainer.AddPoint({2, 3, 0xFFCCDDCC});
         coordsContainer.AddPoint({5, 5, 0xFFBBAADD});
+        coordsContainer.IndexAllPoints();
 
         auto point = coordsContainer.GetClosestPoint(1,1);
         REQUIRE( point.azimuth == 1);
@@ -39,6 +41,7 @@ TEST_CASE( "CoordsContainer2d", "[coords-container-2d]" ) {
         coordsContainer.AddPoint({-1, -1, 0xFFAABBCC});
         coordsContainer.AddPoint({1, 1, 0xFFBBAADD});
         coordsContainer.AddPoint({3, 3, 0xFFBBAADD});
+        coordsContainer.IndexAllPoints();
 
         // I assume it picks the most recent point
         auto point = coordsContainer.GetClosestPoint(2,2);
@@ -54,6 +57,7 @@ TEST_CASE( "CoordsContainer2d", "[coords-container-2d]" ) {
         coordsContainer.AddPoint({-1, -1, 0xFFAABBCC});
         coordsContainer.AddPoint({10.001f, 10.001f, 0xFFAABBCC});
         coordsContainer.AddPoint({30, 30, 0xFFBBAADD});
+        coordsContainer.IndexAllPoints();
 
         auto point = coordsContainer.GetClosestPoint(20,20);
         REQUIRE( point.azimuth == 10.001f);
@@ -70,6 +74,7 @@ TEST_CASE( "CoordsContainer2d", "[coords-container-2d]" ) {
         coordsContainer.AddPoint({1, 2, 0xFFAABBCC});
         coordsContainer.AddPoint({200, 300, 0xFFCCDDCC});
         coordsContainer.AddPoint({5, 5, 0xFFBBAADD});
+        coordsContainer.IndexAllPoints();
 
         auto point = coordsContainer.GetClosestPoint(1000,1000);
         REQUIRE( point.azimuth == 200);

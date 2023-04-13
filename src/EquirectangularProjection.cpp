@@ -38,7 +38,8 @@ std::shared_ptr<SphereCoordsContainer> EquirectangularProjection::LoadImageToSph
             coords->AddPoint(sphericalPt);
         }
     }
-
+    
+    coords->IndexAllPoints();
     return coords;
 }
 

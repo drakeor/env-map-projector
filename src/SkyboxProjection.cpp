@@ -22,6 +22,118 @@ std::shared_ptr<SphereCoordsContainer> SkyboxProjection::LoadImageToSphericalCoo
     coordsCart.empty();
 #endif
 
+    // Preallocate an array big enough to hold the data
+    // from all six images.
+    int totalSize = 0;
+    if(topImage != nullptr)
+        totalSize += (topImage->GetHeight() * topImage->GetWidth());
+    if(bottomImage != nullptr)
+        totalSize += (bottomImage->GetHeight() * bottomImage->GetWidth());
+    if(leftImage != nullptr)
+        totalSize += (leftImage->GetHeight() * leftImage->GetWidth());
+    if(rightImage != nullptr)
+        totalSize += (rightImage->GetHeight() * rightImage->GetWidth());
+    if(frontImage != nullptr)
+        totalSize += (frontImage->GetHeight() * frontImage->GetWidth());
+    if(backImage != nullptr)
+        totalSize += (backImage->GetHeight() * backImage->GetWidth());
+
+    std::cout << "Attempting to allocate coordinate container of size "
+        << totalSize << std::endl;
+
+    std::shared_ptr<SphereCoordsContainer> coords = 
+        std::make_shared<SphereCoordsContainer>(totalSize);
+
+    // Lambda function to convert uv position [0,1] to a coordinates 
+    // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
+    auto f = [=](float i) {
+        return 2*i - 1;
+    };
+    // Inverse of above function. (For reference later)
+    auto f_inv = [=](float i) {
+        return 0.5f*i + 0.5f*1;
+    };
+
+    // Converting UV to coords for a particular side
+    auto uvToCoord = [&](Eigen::Vector3i coordMap, float constVal, EnvMapImage* image) {
+        
+        // We only need to build this matrix once
+        for(int i = 0; i < image->GetWidth(); i++)
+        {
+            for(int j = 0; j < image->GetHeight(); j++)
+            {
+                unsigned int pixelData = image->GetPixel(i, j);
+                float u = (float)i / (float)(image->GetWidth()-1);
+                float v = (float)j / (float)(image->GetHeight()-1);
+
+                // Convert from domain [0,1] to [-1,1] on u and v and add in the constant value
+                Eigen::Vector3f uvCoord(f(u), f(v), constVal);
+
+                // Transform uv to cartesian coordinates
+                // Convert f:[u,v,c] -> [x,y,z]
+                Eigen::Vector3f cartCoord;
+                cartCoord(0) = uvCoord(coordMap[0]);
+                cartCoord(1) = uvCoord(coordMap[1]);
+                cartCoord(2) = uvCoord(coordMap[2]);
+
+#ifdef STORE_CARTESIAN_COORDS
+                coordsCart.push_back(cartCoord);
+#endif
+                // Lastly, convert to spherical coordinates and store.
+                auto newPoint = CartesianToSpherical({
+                    cartCoord.x(), cartCoord.y(), cartCoord.z(),
+                    pixelData
+                });
+                coords->AddPoint(newPoint);
+            }
+            //std::cout << std::endl;
+        }
+    };
+
+
+    // Go through each image and store the result
+
+    // Start with the top image and bottom images
+    {
+        // Top-Bottom plane is simple xy plane. z = {-1, 1}.
+        if(topImage != nullptr)
+            uvToCoord(Eigen::Vector3i(0, 1, 2), 1, topImage);
+        if(bottomImage != nullptr)
+            uvToCoord(Eigen::Vector3i(0, 1, 2), -1, bottomImage);
+    }
+
+    // Do the front and back images
+    {
+        // Front-Back is the yz plane. x = {-1, 1}.
+        if(backImage != nullptr)
+            uvToCoord(Eigen::Vector3i(2, 0, 1), 1, backImage);
+        if(frontImage != nullptr)
+            uvToCoord(Eigen::Vector3i(2, 0, 1), -1, frontImage);
+    }
+
+    // Do the left and right images
+    {
+        // Left-Right is the xz plane. y = {-1, 1}.
+        if(rightImage != nullptr)
+            uvToCoord(Eigen::Vector3i(0, 2, 1), 1, rightImage);
+        if(leftImage != nullptr)
+            uvToCoord(Eigen::Vector3i(0, 2, 1), -1, leftImage);
+    }
+
+    coords->IndexAllPoints();
+    return coords;
+}
+
+/*
+std::shared_ptr<SphereCoordsContainer> SkyboxProjection::LoadImageToSphericalCoords(
+        EnvMapImage* topImage, EnvMapImage* bottomImage, 
+        EnvMapImage* leftImage, EnvMapImage* rightImage,
+        EnvMapImage* frontImage, EnvMapImage* backImage)
+{
+#ifdef STORE_CARTESIAN_COORDS
+    coordsCart.empty();
+#endif
+
         int totalSize = 
                 (topImage->GetHeight() * topImage->GetWidth())
             +   (bottomImage->GetHeight() * bottomImage->GetWidth())
@@ -141,7 +253,7 @@ std::shared_ptr<SphereCoordsContainer> SkyboxProjection::LoadImageToSphericalCoo
     }
 
     return coords;
-}
+}*/
 
 EnvMapImage SkyboxProjection::ConvertToImageTop(SphereCoordsContainer* coords,
     int width, int height)

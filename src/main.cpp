@@ -29,16 +29,14 @@ int main()
     ImageWriter writer;
     writer.SaveImage("converted_output.png", img);
 
-    /*
+/*
     std::vector<Point3df> cartCoords;
     for(int i = 0; i < sphericalPoints.size(); i++)
     {
         Point3df newPoint = proj.SphericalToCartesian(sphericalPoints[i]);
         cartCoords.push_back(newPoint);
     }
-    */
-
-/*
+    
     std::cout << "x = [";
     for(int i = 0; i < cartCoords.size(); i++)
     {
