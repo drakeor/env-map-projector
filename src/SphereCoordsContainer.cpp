@@ -3,7 +3,7 @@
 #include <iostream>
 
 SphereCoordsContainer::SphereCoordsContainer(int requestedSize)
-    : index(2, cloud, { 10 })
+    : index(2, cloud, { 50 })
 {
     cloud.pts.reserve(requestedSize);
     allocatedSize = requestedSize;

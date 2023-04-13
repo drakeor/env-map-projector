@@ -97,9 +97,9 @@ std::shared_ptr<SphereCoordsContainer> SkyboxProjection::LoadImageToSphericalCoo
     {
         // Top-Bottom plane is simple xy plane. z = {-1, 1}.
         if(topImage != nullptr)
-            uvToCoord(Eigen::Vector3i(0, 1, 2), 1, topImage);
+            uvToCoord(Eigen::Vector3i(0, 1, 2), -1, topImage);
         if(bottomImage != nullptr)
-            uvToCoord(Eigen::Vector3i(0, 1, 2), -1, bottomImage);
+            uvToCoord(Eigen::Vector3i(0, 1, 2), 1, bottomImage);
     }
 
     // Do the front and back images
