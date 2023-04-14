@@ -4,17 +4,16 @@ project (EnvMapProjector)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 add_subdirectory(lib/Catch2)
 
 set(SourceFiles 
-    src/Coords3dContainer.cpp
-    src/ImageReader.cpp 
-    src/ImageWriter.cpp 
-    src/EnvMapImage.cpp 
-    src/EquirectangularProjection.cpp
-    src/SkyboxProjection.cpp
-    src/SphereCoordsContainer.cpp
+    src/Coordinates/CoordConversions.cpp
+    src/Coordinates/CoordContainerSpherical.cpp
+    src/Utils/EnvMapImage.cpp
+    src/Utils/ImageReader.cpp
+    src/Utils/ImageWriter.cpp
 )
 
 add_executable (envmapproj 
@@ -24,13 +23,9 @@ add_executable (envmapproj
 
 add_executable (envmapproj_tests 
     tests/test_main.cpp 
-    tests/ConversionTests.cpp
-    tests/SphereCoordsContainerTests.cpp
     tests/EnvMapImageTests.cpp 
-    tests/EquirectangularProjectionTests.cpp 
     tests/ImageReaderTests.cpp 
     tests/ImageWriterTests.cpp
-    tests/SkyboxProjectionTests.cpp
     ${SourceFiles}
 )
 

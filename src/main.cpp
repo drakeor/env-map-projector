@@ -1,11 +1,12 @@
-#include "SphereCoordsContainer.h"
-#include "SkyboxProjection.h"
-#include "EquirectangularProjection.h"
-#include "ImageReader.h"
-#include "ImageWriter.h"
+//#include "SphereCoordsContainer.h"
+//#include "SkyboxProjection.h"
+//#include "EquirectangularProjection.h"
+//#include "ImageReader.h"
+//#include "ImageWriter.h"
 
 int main()
 {
+    /*
     SkyboxProjection proj;
     ImageReader reader;
 
@@ -28,6 +29,7 @@ int main()
 
     ImageWriter writer;
     writer.SaveImage("converted_output.png", img);
+    */
 
 /*
     std::vector<Point3df> cartCoords;

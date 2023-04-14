@@ -1,4 +1,4 @@
-#include "../src/ImageReader.h"
+#include "../src/Utils/ImageReader.h"
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE( "ImageReader", "[image-reader]" ) {
