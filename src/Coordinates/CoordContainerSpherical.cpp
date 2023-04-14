@@ -39,7 +39,7 @@ CoordContainerSpherical<T>::CoordContainerSpherical(unsigned int _azimVectorSize
 }
 
 template<typename T>
-bool CoordContainerSpherical<T>::SetPoint(T azim, T evel, Point3d<T> point)
+bool CoordContainerSpherical<T>::SetPoint(T azim, T evel, PointSphere<T> point)
 {
     mtx.lock();
     auto i = AzimToIndex(azim, evel);
