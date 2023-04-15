@@ -39,17 +39,17 @@ CoordContainerSpherical<T>::CoordContainerSpherical(unsigned int _azimVectorSize
 }
 
 template<typename T>
-bool CoordContainerSpherical<T>::SetPoint(T azim, T evel, PointSphere<T> point)
+bool CoordContainerSpherical<T>::SetPoint(T azim, T evel, uint32_t data)
 {
     mtx.lock();
     auto i = AzimToIndex(azim, evel);
-    points[i] = point;
+    points[i] = data;
     mtx.unlock();
 
     return true;
 }
 
-
+/*
 template<typename T>
 Point3d<T> CoordContainerSpherical<T>::GetClosestPointCartesian(T azim, T evel)
 {
@@ -86,18 +86,6 @@ Point3d<T> CoordContainerSpherical<T>::GetClosestPointCartesian(T x, T y, T z)
 }
 
 template<typename T>
-PointSphere<T> CoordContainerSpherical<T>::GetClosestPointSpherical(T azim, T evel)
-{
-    // Grab point directly
-    mtx.lock();
-    auto i = AzimToIndex(azim, evel);
-    PointSphere<T> point =  points[i];
-    mtx.unlock();
-
-    return point;
-}
-
-template<typename T>
 PointSphere<T> CoordContainerSpherical<T>::GetClosestPointSpherical(T x, T y, T z)
 {
     // Convert to Spherical first
@@ -115,3 +103,30 @@ PointSphere<T> CoordContainerSpherical<T>::GetClosestPointSpherical(T x, T y, T 
 
     return point;
 }
+
+template<typename T>
+PointSphere<T> CoordContainerSpherical<T>::GetClosestPointSpherical(T azim, T evel)
+{
+    // Grab point directly
+    mtx.lock();
+    auto i = AzimToIndex(azim, evel);
+    PointSphere<T> point =  points[i];
+    mtx.unlock();
+
+    return point;
+}
+
+*/
+
+template<typename T>
+uint32_t CoordContainerSpherical<T>::GetClosestPixel(T azim, T evel)
+{
+    // Grab point directly
+    mtx.lock();
+    auto i = AzimToIndex(azim, evel);
+    auto point =  points[i];
+    mtx.unlock();
+
+    return point;
+}
+

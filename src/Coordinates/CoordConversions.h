@@ -2,15 +2,15 @@
 #define _COORD_CONVERSIONS_H_
 
 #include "PointSphere.h"
-#include "Point3d.h"
+#include "../../lib/eigen/Eigen/Dense"
 
 namespace EnvProj
 {
     template<typename T>
-    PointSphere<T> CartesianToSpherical(Point3d<T> point);
+    PointSphere<T> CartesianToSpherical(Eigen::Vector3<T> point);
 
     template<typename T>
-    Point3d<T> SphericalToCartesian(PointSphere<T> point);
+    Eigen::Vector3<T> SphericalToCartesian(PointSphere<T> point);
 }
 
 #endif

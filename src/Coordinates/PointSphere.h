@@ -9,7 +9,6 @@ namespace EnvProj
     struct PointSphere
     {
         T azimuth, elevation;
-        uint32_t pixelValue;
     };
 }
 

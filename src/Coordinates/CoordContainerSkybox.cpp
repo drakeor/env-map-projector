@@ -1,13 +1,20 @@
 #include "CoordContainerSkybox.h"
+#include "CoordConversions.h"
+
+#include "../../lib/eigen/Eigen/Dense"
 
 using namespace std;
 using namespace EnvProj;
 
+using Eigen::Vector3;
+
 template <typename T>
-CoordContainerSkybox<T>::CoordContainerSkybox(unsigned int _sideVectorLength)
+CoordContainerSkybox<T>::CoordContainerSkybox(uint32_t _sideVectorLength)
 {
+    mtx.lock();
     sideVectorLength = _sideVectorLength;
     points.reserve(_sideVectorLength * _sideVectorLength * 6);
+    mtx.unlock();
 }
 
 template <typename T>
@@ -55,8 +62,8 @@ unsigned int CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
     }
 
     // Convert domain of u,v from [-1,1] to [0,sideIndex]
-    unsigned int tex_x = (unsigned int)(((u + 1.0f) * (0.5f)) * sideVectorLength);
-    unsigned int tex_y = (unsigned int)(((v + 1.0f) * (0.5f)) * sideVectorLength);
+    uint32_t tex_x = (uint32_t)(((u + 1.0f) * (0.5f)) * sideVectorLength);
+    uint32_t tex_y = (uint32_t)(((v + 1.0f) * (0.5f)) * sideVectorLength);
 
     // Make sure we're in the domain
     if(tex_x < 0)
@@ -69,16 +76,21 @@ unsigned int CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
         tex_y = sideVectorLength - 1; 
 
     // Return the final coordinate
-    return (tex_y* sideVectorLength + x) * sideIndex;
+    return  (sideIndex * sideVectorLength * sideVectorLength) 
+        * (tex_y * sideVectorLength) + tex_x;
 }
 
 
 template <typename T>
-bool CoordContainerSkybox<T>::SetPoint(T x, T y, T z, Point3d<T> point)
+bool CoordContainerSkybox<T>::SetPoint(T x, T y, T z, uint32_t point)
 {
-
+    mtx.lock();
+    uint32_t index = CartesianToIndex(x, y, z);
+    points[index] = point;
+    mtx.unlock();
 }
 
+/*
 template<typename T>
 Point3d<T> CoordContainerSkybox<T>::GetClosestPointCartesian(T azim, T evel)
 {
@@ -92,13 +104,58 @@ Point3d<T> CoordContainerSkybox<T>::GetClosestPointCartesian(T x, T y, T z)
 }
 
 template<typename T>
-PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T azim, T evel)
+PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T x, T y, T z)
 {
     
 }
 
 template<typename T>
-PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T x, T y, T z)
+PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T azim, T evel)
 {
-    
+
 }
+*/
+
+template<typename T>
+uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
+{
+    // Convert to cartesian
+    Eigen::Vector3<T> point = SphericalToCartesian({azim, evel});
+
+    // Grab absolute values and furthest coordinate value from zero.
+    Eigen::Vector3<T> pointAbs(
+        fabs(cartPoint.x), 
+        fabs(cartPoint.y), 
+        fabs(cartPoint.z)
+    );
+    constexpr float largestVal = pointAbs.maxCoeff();
+
+    // Bounds checking (prevent divide by zero error)
+    if(largestVal == 0)
+        return 0;
+
+    // Furtherest coordinate from zero should be the first to intersect 
+    // with one side of the unit cube. We need to divide by abs since
+    // negatives will cancel out.
+    float targetLen = 1.0f;
+    if(largestVal == pointAbs.x()) {
+        targetLen = 1.0f / pointAbs.x();
+    } else if(largestVal == pointAbs.y()) {
+        targetLen = 1.0f / pointAbs.y();
+    } else {
+        targetLen = 1.0f / pointAbs.z();
+    }
+
+    // We'll just scale the unit vector until it hits that side.
+    Eigen::Vector3<T> scaledPoint = targetLen * point;
+
+    // And grab the corresponding pixel
+    mtx.lock();
+    uint32_t index = CartesianToIndex(scaledPoint.x(), scaledPoint.y(), scaledPoint.z());
+    uint32_t data = points[index];
+    mtx.unlock();
+
+    return data;
+}
+
+
