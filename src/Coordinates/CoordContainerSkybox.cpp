@@ -10,11 +10,9 @@ using Eigen::Vector3;
 
 template <typename T>
 CoordContainerSkybox<T>::CoordContainerSkybox(uint32_t _sideVectorLength)
+    : points(_sideVectorLength * _sideVectorLength * 6, 0)
 {
-    mtx.lock();
     sideVectorLength = _sideVectorLength;
-    points.reserve(_sideVectorLength * _sideVectorLength * 6);
-    mtx.unlock();
 }
 
 template <typename T>

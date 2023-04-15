@@ -4,16 +4,16 @@ using namespace std;
 using namespace EnvProj;
 
 template<typename T>
-PointSphere<T> CartesianToSpherical(Eigen::Vector3<T> point)
+PointSphere<T> CoordConversions<T>::CartesianToSpherical(Eigen::Vector3<T> point)
 {
-        PointSphere<T> newPoint
-        newPoint.azimuth = atan2(point.y, point.x);
-        newPoint.elevation = atan2(point.z, sqrt(point.x * point.x + point.y * point.y));
+        PointSphere<T> newPoint;
+        newPoint.azimuth = atan2(point.y(), point.x());
+        newPoint.elevation = atan2(point.z(), sqrt(point.x() * point.x() + point.y() * point.y()));
         return newPoint;
 }
 
 template<typename T>
-Eigen::Vector3<T> SphericalToCartesian(PointSphere<T> point)
+Eigen::Vector3<T> CoordConversions<T>::SphericalToCartesian(PointSphere<T> point)
 {
     // Remember that r=1 since everything is done against the unit sphere.
     Eigen::Vector3<T> newPoint(

@@ -88,28 +88,22 @@ std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSpherical
     // Go through each image and store the result
 
     // Start with the top image and bottom images
-    {
-        if(topImage != nullptr)
-            uvToCoord(SideToCoordMap(TopSurf), SideToConstVal(TopSurf), topImage);
-        if(bottomImage != nullptr)
-            uvToCoord(SideToCoordMap(BottomSurf), SideToConstVal(BottomSurf), bottomImage);
-    }
+    if(topImage != nullptr)
+        uvToCoord(SideToCoordMap(TopSurf), SideToConstVal(TopSurf), topImage);
+    if(bottomImage != nullptr)
+        uvToCoord(SideToCoordMap(BottomSurf), SideToConstVal(BottomSurf), bottomImage);
 
     // Do the front and back images
-    {
-        if(backImage != nullptr)
-            uvToCoord(BackSurf), SideToConstVal(BackSurf), backImage);
-        if(frontImage != nullptr)
-            uvToCoord(FrontSurf), SideToConstVal(FrontSurf), frontImage);
-    }
+    if(backImage != nullptr)
+        uvToCoord(BackSurf), SideToConstVal(BackSurf), backImage);
+    if(frontImage != nullptr)
+        uvToCoord(FrontSurf), SideToConstVal(FrontSurf), frontImage);
 
     // Do the left and right images
-    {
-        if(rightImage != nullptr)
-            uvToCoord(RightSurf), SideToConstVal(RightSurf), rightImage);
-        if(leftImage != nullptr)
-            uvToCoord(LeftSurf), SideToConstVal(LeftSurf), leftImage);
-    }
+    if(rightImage != nullptr)
+        uvToCoord(RightSurf), SideToConstVal(RightSurf), rightImage);
+    if(leftImage != nullptr)
+        uvToCoord(LeftSurf), SideToConstVal(LeftSurf), leftImage);
 
     std::shared_ptr<CoordContainerBase<T>> ptrBase = sphereCoords;
     return ptrBase;
@@ -167,10 +161,13 @@ T SkyboxProjection<T>::SideToConstVal(SkyboxSurf side)
 {
     switch(side)
     {
+        // These are on positive axis
         case BottomSurf:
         case BackSurf:
         case RightSurf:
             return 1.0f;
+
+        // These are on negative axis
         case TopSurf:
         case LeftSurf:
         case FrontSurf:

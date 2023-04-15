@@ -7,10 +7,15 @@
 namespace EnvProj
 {
     template<typename T>
-    PointSphere<T> CartesianToSpherical(Eigen::Vector3<T> point);
+    class CoordConversions
+    {
+        public:
+            static PointSphere<T> CartesianToSpherical(Eigen::Vector3<T> point);
+            static Eigen::Vector3<T> SphericalToCartesian(PointSphere<T> point);
+    };
 
-    template<typename T>
-    Eigen::Vector3<T> SphericalToCartesian(PointSphere<T> point);
+    template class CoordConversions<float>;
+    template class CoordConversions<double>;
 }
 
 #endif

@@ -23,6 +23,7 @@ add_executable (envmapproj
 
 add_executable (envmapproj_tests 
     tests/test_main.cpp 
+    tests/CoordContainerSphericalTests.cpp
     tests/EnvMapImageTests.cpp 
     tests/ImageReaderTests.cpp 
     tests/ImageWriterTests.cpp

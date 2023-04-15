@@ -26,7 +26,9 @@ namespace EnvProj
         uint32_t azimVectorSize;
         uint32_t evelVectorSize;
     };
-}
 
+    template class CoordContainerSpherical<float>;
+    template class CoordContainerSpherical<double>;
+}
 
 #endif
