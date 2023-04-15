@@ -90,37 +90,12 @@ bool CoordContainerSkybox<T>::SetPoint(T x, T y, T z, uint32_t point)
     mtx.unlock();
 }
 
-/*
-template<typename T>
-Point3d<T> CoordContainerSkybox<T>::GetClosestPointCartesian(T azim, T evel)
-{
-
-}
 
 template<typename T>
-Point3d<T> CoordContainerSkybox<T>::GetClosestPointCartesian(T x, T y, T z)
-{
-
-}
-
-template<typename T>
-PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T x, T y, T z)
-{
-    
-}
-
-template<typename T>
-PointSphere<T> CoordContainerSkybox<T>::GetClosestPointSpherical(T azim, T evel)
-{
-
-}
-*/
-
-template<typename T>
-uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
+uint32_t CoordContainerSkybox<T>::GetClosestPixel(T x, T y, T z)
 {
     // Convert to cartesian
-    Eigen::Vector3<T> point = SphericalToCartesian({azim, evel});
+    Eigen::Vector3<T> point(x, y, z);
 
     // Grab absolute values and furthest coordinate value from zero.
     Eigen::Vector3<T> pointAbs(
@@ -156,6 +131,15 @@ uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
     mtx.unlock();
 
     return data;
+}
+
+
+template<typename T>
+uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
+{
+    // Convert to cartesian and pass to above function
+    Eigen::Vector3<T> point = SphericalToCartesian({azim, evel});
+    return GetClosestPixel(point.x(), point.y(), point.z());
 }
 
 

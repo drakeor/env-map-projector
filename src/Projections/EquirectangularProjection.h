@@ -5,26 +5,30 @@
 #include <vector>
 #include <memory>
 
-#include "SphereCoordsContainer.h"
-#include "EnvMapImage.h"
-#include "Point2d.h"
-#include "SpherePoint.h"
+#include "../../lib/eigen/Eigen/Dense"
 
-class EquirectangularProjection
+#include "../Coordinates/CoordContainerBase.h"
+#include "../Utils/EnvMapImage.h"
+#include "../Coordinates/PointSphere.h"
+
+namespace EnvProj
 {
-public:
-    EquirectangularProjection();
-    ~EquirectangularProjection();
+    template <typename T>
+    class EquirectangularProjection
+    {
+    public:
+        EquirectangularProjection();
+        ~EquirectangularProjection();
 
-    std::shared_ptr<SphereCoordsContainer> LoadImageToSphericalCoords(
-        EnvMapImage* image);
-    EnvMapImage ConvertToImage(SphereCoordsContainer* coords,
-        int width, int height);
+        std::shared_ptr<CoordContainerBase<T>> 
+            LoadImageToSphericalCoords(EnvMapImage* image);
+        EnvMapImage ConvertToImage(CoordContainerBase<T>* coords,
+            int width, int height);
 
-    SpherePointf UVToSpherical(Point2df uvPoint);
-    Point2df SphericalToUV(SpherePointf uvPoint);
+        PointSphere<T> UVToSpherical(T u, T v);
 
-private:
-};
+    private:
+    };
+}
 
 #endif

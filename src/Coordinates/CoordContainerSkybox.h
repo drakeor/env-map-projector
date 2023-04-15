@@ -11,13 +11,9 @@ namespace EnvProj
     public:
         CoordContainerSkybox(uint32_t _sideVectorLength);
         bool SetPoint(T x, T y, T z, uint32_t data);
-/*
-        Point3d<T> GetClosestPointCartesian(T azim, T evel) = 0;
-        Point3d<T> GetClosestPointCartesian(T x, T y, T z) = 0;
-        PointSphere<T> GetClosestPointSpherical(T x, T y, T z) = 0;
-        PointSphere<T> GetClosestPointSpherical(T azim, T evel) = 0;
-*/
-        uint32_t GetClosestPixel(T azim, T evel) = 0;
+        
+        uint32_t GetClosestPixel(T azim, T evel);
+        uint32_t GetClosestPixel(T x, T y, T z);
 
     private:
         uint32_t CartesianToIndex(T x, T y, T z);

@@ -1,18 +1,25 @@
 #include "EquirectangularProjection.h"
 
+using namespace EnvProj;
+using namespace std;
+
 const float pi = 3.14159265358979323846f;
 
-EquirectangularProjection::EquirectangularProjection()
+template <typename T>
+EquirectangularProjection<T>::EquirectangularProjection()
 {
 
 }
 
-EquirectangularProjection::~EquirectangularProjection()
+template <typename T>
+EquirectangularProjection<T>::~EquirectangularProjection()
 {
 
 }
 
-std::shared_ptr<SphereCoordsContainer> EquirectangularProjection::LoadImageToSphericalCoords(
+template <typename T>
+std::shared_ptr<CoordContainerBase<T>> 
+    EquirectangularProjection<T>::LoadImageToSphericalCoords(
     EnvMapImage* image)
 {
     int totalSize = (image->GetHeight() * image->GetWidth());
@@ -20,8 +27,8 @@ std::shared_ptr<SphereCoordsContainer> EquirectangularProjection::LoadImageToSph
     std::cout << "Attempting to allocate coordinate container of size "
         << totalSize << std::endl;
 
-    std::shared_ptr<SphereCoordsContainer> coords = 
-        std::make_shared<SphereCoordsContainer>(totalSize);
+    std::shared_ptr<SphereCoordsContainer<T>> sphereCoords = 
+        std::make_shared<SphereCoordsContainer<T>>(totalSize);
 
     for(int i = 0; i < image->GetWidth(); i++)
     {
@@ -30,20 +37,22 @@ std::shared_ptr<SphereCoordsContainer> EquirectangularProjection::LoadImageToSph
             // Convert to UV coords. Domain: [0,1]
             float u = (float)i / (float)(image->GetWidth()-1);
             float v = (float)j / (float)(image->GetHeight()-1);
-            unsigned int pixelData = image->GetPixel(i, j);
+            uint32_t pixelData = image->GetPixel(i, j);
 
             // Coordinates are stored internally as spherical coordinates
             // Convert and add to our coordinate collection
-            auto sphericalPt = UVToSpherical({u, v, pixelData});
-            coords->AddPoint(sphericalPt);
+            PointSphere<T> sphericalPt = UVToSpherical(u, v);
+            sphereCoords->SetPoint(sphericalPt.azimuth, sphericalPt.elevation, pixelData);
         }
     }
     
-    coords->IndexAllPoints();
-    return coords;
+    // I'll have to check if this ref-counts correctly...
+    std::shared_ptr<CoordContainerBase<T>> ptrBase = sphereCoords;
+    return ptrBase;
 }
 
-EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coords, 
+template <typename T>
+EnvMapImage EquirectangularProjection<T>::ConvertToImage(CoordContainerBase<T>* coords, 
     int width, int height)
 {
     // TODO: We should error check that coords actually has points?
@@ -58,15 +67,11 @@ EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coo
             float u = (float)i / (float)(width-1);
             float v = (float)j / (float)(height-1);
 
-            // Coordinates are stored as Spherical, so convert and grab the closest point data
-            Point2df uvPoint;
-            uvPoint.x = u;
-            uvPoint.y = v;
-
-            auto sphericalPt = UVToSpherical(uvPoint);
-            auto pointData = coords->GetClosestPoint(sphericalPt.azimuth,
+            // Equirectangular is the easiest. Grab the spherical points.
+            auto sphericalPt = UVToSpherical(u, v);
+            uint32_t pointData = coords->GetClosestPixel(sphericalPt.azimuth,
                 sphericalPt.elevation);
-            unsigned int pixelData = pointData.pixelValue;
+            unsigned int pixelData = pointData;
 
             // Set pixel in the final UV image
             newImage.SetPixel(i, j, pixelData);
@@ -76,23 +81,12 @@ EnvMapImage EquirectangularProjection::ConvertToImage(SphereCoordsContainer* coo
     return newImage;
 }
 
-
-SpherePointf EquirectangularProjection::UVToSpherical(Point2df inputPt)
+template<typename T>
+PointSphere<T> EquirectangularProjection<T>::UVToSpherical(T u, T v)
 {
-    SpherePointf newPoint;
+    PointSphere<T> newPoint;
     newPoint.azimuth = (inputPt.x * 2.0f * pi) - pi;
     newPoint.elevation = (inputPt.y * pi) - (pi/2);
-    newPoint.pixelValue = inputPt.pixelValue;
-
-    return newPoint;
-}
-
-Point2df EquirectangularProjection::SphericalToUV(SpherePointf inputPt)
-{
-    Point2df newPoint;
-    newPoint.x = (inputPt.azimuth + pi) / (2.0f * pi);
-    newPoint.y = (inputPt.elevation + (pi/2))/ pi;
-    newPoint.pixelValue = inputPt.pixelValue;
 
     return newPoint;
 }
