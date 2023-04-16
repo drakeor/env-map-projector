@@ -1,35 +1,34 @@
-//#include "SphereCoordsContainer.h"
-//#include "SkyboxProjection.h"
-//#include "EquirectangularProjection.h"
-//#include "ImageReader.h"
-//#include "ImageWriter.h"
+#include "Projections/SkyboxProjection.h"
+#include "Projections/EquirectangularProjection.h"
+#include "Utils/ImageReader.h"
+#include "Utils/ImageWriter.h"
+
+using namespace EnvProj;
 
 int main()
 {
-    /*
-    SkyboxProjection proj;
+    
+    SkyboxProjection<double> skyboxProj;
     ImageReader reader;
 
-    auto topImg = reader.LoadImage("assets/skybox/top.jpg");
-    auto bottomImg = reader.LoadImage("assets/skybox/bottom.jpg");
-    auto leftImg = reader.LoadImage("assets/skybox/left.jpg");
-    auto rightImg = reader.LoadImage("assets/skybox/right.jpg");
-    auto frontImg = reader.LoadImage("assets/skybox/front.jpg");
-    auto backImg = reader.LoadImage("assets/skybox/back.jpg");
+    auto topImg = reader.LoadImage("assets/skybox_big/top.jpg");
+    auto bottomImg = reader.LoadImage("assets/skybox_big/bottom.jpg");
+    auto leftImg = reader.LoadImage("assets/skybox_big/left.jpg");
+    auto rightImg = reader.LoadImage("assets/skybox_big/right.jpg");
+    auto frontImg = reader.LoadImage("assets/skybox_big/front.jpg");
+    auto backImg = reader.LoadImage("assets/skybox_big/back.jpg");
 
-    SkyboxProjection skyboxProj;
     auto coords = skyboxProj.LoadImageToSphericalCoords(
         &topImg, &bottomImg,
         &leftImg, &rightImg, &frontImg, &backImg);
 
-    auto sphericalPoints = coords->GetAllPoints();
 
-    EquirectangularProjection equiProj;
-    auto img = equiProj.ConvertToImage(coords.get(), 500, 250);
+    EquirectangularProjection<double> equiProj;
+    auto img = equiProj.ConvertToImage(coords.get(), 2048, 1024);
 
     ImageWriter writer;
     writer.SaveImage("converted_output.png", img);
-    */
+    
 
 /*
     std::vector<Point3df> cartCoords;
