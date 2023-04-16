@@ -1,6 +1,8 @@
 #ifndef _COORD_CONTAINER_SPHERICAL_H_
 #define _COORD_CONTAINER_SPHERICAL_H_
 
+//#define DEBUG_PRINT_COORD_CONTAINER_SPHERICAL
+
 #include "CoordContainerBase.h"
 
 #include <vector>

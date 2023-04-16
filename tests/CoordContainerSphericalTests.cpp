@@ -23,13 +23,15 @@ TEST_CASE( "CoordContainerSpherical", "[coords-container-spherical]" ) {
         CoordContainerSpherical<float> coords(4, 4);
 
         coords.SetPoint(0, 0, 0xAA);
-        coords.SetPoint(0, pi, 0xBB);
-        coords.SetPoint(pi, 0, 0xCC);
-        coords.SetPoint(pi, pi, 0xDD);
-
         REQUIRE( coords.GetClosestPixel(0, 0) == 0xAA );
+
+        coords.SetPoint(0, pi, 0xBB);
         REQUIRE( coords.GetClosestPixel(0, pi) == 0xBB );
+
+        coords.SetPoint(pi, 0, 0xCC);
         REQUIRE( coords.GetClosestPixel(pi, 0) == 0xCC );
+
+        coords.SetPoint(pi, pi, 0xDD);
         REQUIRE( coords.GetClosestPixel(pi, pi) == 0xDD );
     }
 
@@ -61,19 +63,24 @@ TEST_CASE( "CoordContainerSpherical", "[coords-container-spherical]" ) {
     }
 
     // Cartesian coordinate detection
-    SECTION( "cart detect" ) {
+    SECTION( "cart conversion" ) {
 
-        CoordContainerSpherical<float> coords(4, 4);
+        CoordContainerSpherical<float> coords(100, 100);
 
-        coords.SetPoint(0, 0, 0xAA);
-        coords.SetPoint(0, pi, 0xBB);
-        coords.SetPoint(pi, 0, 0xCC);
-        coords.SetPoint(pi, pi, 0xDD);
+        // This is the coordinate marking [1,1,1]
+        coords.SetPoint(0.7854f, 0.6155f, 0xAA);
+        REQUIRE( coords.GetClosestPixel(1, 1, 1) == 0xAA );
+        
+        // This is the coordinate marking [0.5, 1, 0.75]
+        coords.SetPoint(1.1071f, 0.5909f, 0xBB);
+        REQUIRE( coords.GetClosestPixel(0.5f, 1, 0.75f) == 0xBB );
 
-        // (1,0,0) is closest to 0xAA
-        REQUIRE( coords.GetClosestPixel(1, 0, 0) == 0xAA );
-        // Opposite side should be closest to 0xCC (since it's pi)
-        REQUIRE( coords.GetClosestPixel(-1, 0, 0) == 0xCC );
+        // This is the coordinate marking [-1, -1, -0.75]
+        coords.SetPoint(-2.3562f, -0.4876, 0xCC);
+        REQUIRE( coords.GetClosestPixel(-1, -1, -0.75f) == 0xCC );
+
+        // Zero test
+        REQUIRE( coords.GetClosestPixel(0, 0, 1) == 0x00 );
     }
 
 }

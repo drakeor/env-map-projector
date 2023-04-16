@@ -10,6 +10,7 @@ add_subdirectory(lib/Catch2)
 
 set(SourceFiles 
     src/Coordinates/CoordConversions.cpp
+    src/Coordinates/CoordContainerSkybox.cpp
     src/Coordinates/CoordContainerSpherical.cpp
     src/Utils/EnvMapImage.cpp
     src/Utils/ImageReader.cpp
@@ -23,6 +24,8 @@ add_executable (envmapproj
 
 add_executable (envmapproj_tests 
     tests/test_main.cpp 
+    tests/CoordContainerSkyboxTests.cpp
+    tests/CoordConversionTests.cpp
     tests/CoordContainerSphericalTests.cpp
     tests/EnvMapImageTests.cpp 
     tests/ImageReaderTests.cpp 

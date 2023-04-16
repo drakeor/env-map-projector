@@ -24,7 +24,11 @@ unsigned int CoordContainerSpherical<T>::AzimElevToIndex(T azim, T evel)
     if(y >= evelVectorSize)
         y = evelVectorSize - 1;
 
-    return (y* azimVectorSize + x);
+    uint32_t finalIndex = (y* azimVectorSize + x);
+    if(finalIndex < 0 || finalIndex >= points.size())
+        throw std::range_error("Index is outside the range of size of array!");
+
+    return finalIndex;
 }
 
 template<typename T>
@@ -33,6 +37,10 @@ CoordContainerSpherical<T>::CoordContainerSpherical(unsigned int _azimVectorSize
 {
     azimVectorSize = _azimVectorSize;
     evelVectorSize = _evelVectorSize;
+#ifdef DEBUG_PRINT_COORD_CONTAINER_SPHERICAL
+        std::cout << "Allocating container with length " 
+        << points.size() << std::endl;
+#endif
 }
 
 template<typename T>
@@ -42,6 +50,11 @@ bool CoordContainerSpherical<T>::SetPoint(T azim, T evel, uint32_t data)
     auto i = AzimElevToIndex(azim, evel);
     points[i] = data;
     mtx.unlock();
+
+#ifdef DEBUG_PRINT_COORD_CONTAINER_SPHERICAL
+    std::cout << "Set Point " 
+        << i << std::endl;
+#endif
 
     return true;
 }
@@ -54,6 +67,11 @@ uint32_t CoordContainerSpherical<T>::GetClosestPixel(T azim, T evel)
     auto i = AzimElevToIndex(azim, evel);
     auto point =  points[i];
     mtx.unlock();
+
+#ifdef DEBUG_PRINT_COORD_CONTAINER_SPHERICAL
+    std::cout << "Get Point " 
+        << i << std::endl;
+#endif
 
     return point;
 }

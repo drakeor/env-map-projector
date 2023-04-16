@@ -2,6 +2,10 @@
 #define _COORD_CONTAINER_CARTESIAN_H_
 
 #include "CoordContainerBase.h"
+#include <memory>
+#include <mutex>
+
+#define DEBUG_PRINT_COORD_CONTAINER_SKYBOX
 
 namespace EnvProj
 {
@@ -22,6 +26,9 @@ namespace EnvProj
         std::mutex mtx;
         uint32_t sideVectorLength;
     };
+
+    template class CoordContainerSkybox<float>;
+    template class CoordContainerSkybox<double>;
 }
 
 #endif
