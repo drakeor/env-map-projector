@@ -59,18 +59,90 @@ std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSpherical
     std::shared_ptr<CoordContainerSkybox<T>> coords = 
         std::make_shared<CoordContainerSkybox<T>>(totalSize);
 
-    // Lambda function to convert uv position [0,1] to a coordinates 
-    // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
-    auto f = [=](float i) {
-        return 2*i - 1;
-    };
-    // Inverse of above function. (For reference later)
-    auto f_inv = [=](float i) {
-        return 0.5f*i + 0.5f*1;
+    
+    // Converting UV to coords for a particular side
+    auto uvToCoord = [&](SkyboxSurf surf, EnvMapImage* image) {
+        // We only need to build this matrix once
+        for(int i = 0; i < image->GetWidth(); i++)
+        {
+            for(int j = 0; j < image->GetHeight(); j++)
+            {
+                unsigned int pixelData = image->GetPixel(i, j);
+                coords->SetPointDirect(surf, i, j, pixelData);
+            }
+        }
     };
 
+
+    // Go through each image and store the result
+
+    // Start with the top image and bottom images
+    if(topImage != nullptr) {
+        uvToCoord(TopSurf, topImage);
+    }
+    if(bottomImage != nullptr)
+        uvToCoord(BottomSurf, bottomImage);
+
+    // Do the front and back images
+    if(backImage != nullptr)
+        uvToCoord(BackSurf, backImage);
+    if(frontImage != nullptr)
+        uvToCoord(FrontSurf, frontImage);
+
+    // Do the left and right images
+    if(rightImage != nullptr)
+        uvToCoord(RightSurf, rightImage);
+    if(leftImage != nullptr)
+        uvToCoord(LeftSurf, leftImage);
+
+    std::shared_ptr<CoordContainerBase<T>> ptrBase = coords;
+    return ptrBase;
+}
+
+/*
+template<typename T>
+std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSphericalCoords(
+        EnvMapImage* topImage, EnvMapImage* bottomImage, 
+        EnvMapImage* leftImage, EnvMapImage* rightImage,
+        EnvMapImage* frontImage, EnvMapImage* backImage)
+{
+
+    // Both sanity check and get the length for the sides at the same time.
+    auto sideLength = [=](EnvMapImage* image, int currentSideLen) {
+        // Ignore non-loaded images
+        if(image == nullptr)
+            return currentSideLen;
+        // If loaded, make sure its a valid length
+        if(image->GetHeight() == 0) {
+            throw std::range_error("Skybox images must have a non-zero size!");
+        }
+        // Make sure it's square
+        if(image->GetHeight() != image->GetWidth()) {
+            throw std::range_error("Skybox images must be square!");
+        }
+        // Make sure side length matches the other side lengths.
+        if(currentSideLen != 0) {
+            if(currentSideLen != image->GetHeight()) {
+                throw std::range_error("All skybox images must be the same size!");
+            }
+        }
+        return image->GetHeight();
+    };
+
+    // Grab the side length
+    int totalSize = sideLength(topImage, 0);
+    totalSize = sideLength(bottomImage, totalSize);
+    totalSize = sideLength(leftImage, totalSize);
+    totalSize = sideLength(rightImage, totalSize);
+    totalSize = sideLength(frontImage, totalSize);
+    totalSize = sideLength(backImage, totalSize);
+
+    std::shared_ptr<CoordContainerSkybox<T>> coords = 
+        std::make_shared<CoordContainerSkybox<T>>(totalSize);
+
+    
     // Converting UV to coords for a particular side
-    auto uvToCoord = [&](Eigen::Vector3i coordMap, float constVal, EnvMapImage* image) {
+    auto uvToCoord = [&](Eigen::Vector3i coordMap, T constVal, EnvMapImage* image) {
         
         // We only need to build this matrix once
         for(int i = 0; i < image->GetWidth(); i++)
@@ -78,11 +150,16 @@ std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSpherical
             for(int j = 0; j < image->GetHeight(); j++)
             {
                 unsigned int pixelData = image->GetPixel(i, j);
-                float u = (float)i / (float)(image->GetWidth()-1);
-                float v = (float)j / (float)(image->GetHeight()-1);
+                T u = (T)i / (T)(image->GetWidth() - 1);
+                T v = (T)j / (T)(image->GetHeight() - 1);
+
+                // Convert uv position [0,1] to a coordinates 
+                // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
+                u = 2.0f * u - 1.0f;
+                v = 2.0f * v - 1.0f;
 
                 // Convert from domain [0,1] to [-1,1] on u and v and add in the constant value
-                Eigen::Vector3f uvCoord(f(u), f(v), constVal);
+                Eigen::Vector3f uvCoord(u, v, constVal);
 
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,c] -> [x,y,z]
@@ -92,7 +169,7 @@ std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSpherical
                 cartCoord(2) = uvCoord(coordMap[2]);
 
                 // Lastly, convert to spherical coordinates and store.
-                coords->SetPoint(cartCoord.x(), cartCoord.y(), cartCoord.z(), pixelData);
+                //coords->SetPoint(cartCoord.x(), cartCoord.y(), cartCoord.z(), pixelData);
             }
         }
     };
@@ -121,7 +198,7 @@ std::shared_ptr<CoordContainerBase<T>> SkyboxProjection<T>::LoadImageToSpherical
     std::shared_ptr<CoordContainerBase<T>> ptrBase = coords;
     return ptrBase;
 }
-
+*/
 
 template <typename T>
 std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBase<T>* coords,
@@ -132,12 +209,6 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
         EnvMapImage(sideLength, sideLength), EnvMapImage(sideLength, sideLength),
         EnvMapImage(sideLength, sideLength), EnvMapImage(sideLength, sideLength),
         EnvMapImage(sideLength, sideLength), EnvMapImage(sideLength, sideLength) 
-    };
-
-    // Lambda function to convert uv position [0,1] to a coordinates 
-    // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
-    auto f = [=](float i) {
-        return 2*i - 1;
     };
 
     // Output all six images
@@ -151,11 +222,16 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
         {
             for(int j = 0; j < skyboxImgs[k].GetHeight(); j++)
             {
-                float u = (float)i / (float)(skyboxImgs[k].GetWidth()-1);
-                float v = (float)j / (float)(skyboxImgs[k].GetHeight()-1);
+                float u = (float)i / (float)(skyboxImgs[k].GetWidth() - 1);
+                float v = (float)j / (float)(skyboxImgs[k].GetHeight() - 1);
+
+                // Convert uv position [0,1] to a coordinates 
+                // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
+                u = 2.0f * u - 1.0f;
+                v = 2.0f * v - 1.0f;
 
                 // Convert from domain [0,1] to [-1,1] on u and v and add in the constant value
-                Eigen::Vector3f uvCoord(f(u), f(v), constVal);
+                Eigen::Vector3f uvCoord(u, v, constVal);
 
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,c] -> [x,y,z]

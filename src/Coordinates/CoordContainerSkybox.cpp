@@ -14,6 +14,9 @@ template <typename T>
 CoordContainerSkybox<T>::CoordContainerSkybox(uint32_t _sideVectorLength)
     : points(_sideVectorLength * _sideVectorLength * 6, 0)
 {
+    std::cout << "Allocating skybox container with length " 
+        << points.size() << std::endl;
+
 #ifdef DEBUG_PRINT_COORD_CONTAINER_SKYBOX
     std::cout << "Allocating container with length " 
         << points.size() << std::endl;
@@ -34,51 +37,72 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
     // Grab from one of the sides based on being on the edge of the skybox.
     T u = 0;
     T v = 0;
+    
+    // TODO: The following needs to be consolidated into a map function
+    // like we have for SkyboxProjection.cpp
     if(fabs(x - 1) < epsilon)
     {
-        sideIndex = 0;
+        sideIndex = static_cast<uint32_t>(BackSurf);
         u = y;
         v = z;
     } else if(fabs(x + 1) < epsilon)
     {
-        sideIndex = 1;
+        sideIndex = static_cast<uint32_t>(FrontSurf);
         u = y;
         v = z;
     } else if(fabs(y - 1) < epsilon)
     {
-        sideIndex = 2;
+        sideIndex = static_cast<uint32_t>(RightSurf);
         u = x;
         v = z;
     } else if(fabs(y + 1) < epsilon)
     {
-        sideIndex = 3;
+        sideIndex = static_cast<uint32_t>(LeftSurf);
         u = x;
         v = z;
     } else if(fabs(z - 1) < epsilon)
     {
-        sideIndex = 4;
+        sideIndex = static_cast<uint32_t>(BottomSurf);
         u = x;
         v = y;
     } else if(fabs(z + 1) < epsilon)
     {
-        sideIndex = 5;
+        sideIndex = static_cast<uint32_t>(TopSurf);
         u = x;
         v = y;
     }
 
     // Convert domain of u,v from [-1,1] to [0,sideIndex]
-    uint32_t tex_x = (uint32_t)(((u + 1.0f) * (0.5f)) * sideVectorLength);
-    uint32_t tex_y = (uint32_t)(((v + 1.0f) * (0.5f)) * sideVectorLength);
+    T u_scaled = ((u + 1.0f) * (0.5f));
+    T v_scaled = ((v + 1.0f) * (0.5f));
+    uint32_t tex_x = (uint32_t)(u_scaled * sideVectorLength);
+    uint32_t tex_y = (uint32_t)(v_scaled * sideVectorLength);
 
     // Make sure we're in the domain
-    if(tex_x < 0)
+    if(tex_x < 0) {
+        std::cout << "u is " << u_scaled << std::endl;
+        std::cout << "tex_x escaped bounds 0>" << tex_x << std::endl;
         tex_x = 0;
-    if(tex_y < 0)
+    }
+    if(tex_y < 0) {
+        std::cout << "v is " << v_scaled << std::endl;
+        std::cout << "tex_y escaped bounds 0>" << tex_y << std::endl;
         tex_y = 0;  
-    if(tex_x >= sideVectorLength)
+    }
+    if(tex_x >= sideVectorLength) {
+        if(tex_x > sideVectorLength) {
+            std::cout << "u is " << u_scaled << std::endl;
+            std::cout << "tex_x escaped bounds " << tex_x << ">" << sideVectorLength << std::endl;
+        }
         tex_x = sideVectorLength - 1;
-    if(tex_y >= sideVectorLength)
+    }
+    if(tex_y >= sideVectorLength) {
+        if(tex_y > sideVectorLength) {
+            std::cout << "v is " << v_scaled << std::endl;
+            std::cout << "tex_y escaped bounds " << tex_y << ">" << sideVectorLength << std::endl;
+        }
         tex_y = sideVectorLength - 1; 
+    }
 
     // Return the final coordinate
 #ifdef DEBUG_PRINT_COORD_CONTAINER_SKYBOX
@@ -113,6 +137,25 @@ bool CoordContainerSkybox<T>::SetPoint(T x, T y, T z, uint32_t point)
     return true;
 }
 
+template <typename T>
+bool CoordContainerSkybox<T>::SetPointDirect(SkyboxSurf surf, T tex_x, T tex_y, uint32_t point)
+{
+    mtx.lock();
+    
+    uint32_t finalIndex = (static_cast<uint32_t>(surf) * sideVectorLength * sideVectorLength) 
+        + (tex_y * sideVectorLength) + tex_x;
+    if(finalIndex < 0 || finalIndex >= points.size()) {
+        std::cout << "SetPointDirect Attempting to access index " << finalIndex << std::endl;
+        std::cout << "Size of array is " << points.size() << std::endl;
+        throw std::range_error("Index is outside the range of size of array!");
+    }
+    points[finalIndex] = point;
+
+    mtx.unlock();
+
+    return true;
+}
+
 
 template<typename T>
 uint32_t CoordContainerSkybox<T>::GetClosestPixel(T x, T y, T z)
@@ -126,7 +169,7 @@ uint32_t CoordContainerSkybox<T>::GetClosestPixel(T x, T y, T z)
         fabs(point.y()), 
         fabs(point.z())
     );
-    float largestVal = pointAbs.maxCoeff();
+    T largestVal = pointAbs.maxCoeff();
 
     // Bounds checking (prevent divide by zero error)
     if(largestVal == 0)
@@ -135,7 +178,7 @@ uint32_t CoordContainerSkybox<T>::GetClosestPixel(T x, T y, T z)
     // Furtherest coordinate from zero should be the first to intersect 
     // with one side of the unit cube. We need to divide by abs since
     // negatives will cancel out.
-    float targetLen = 1.0f;
+    T targetLen = 1.0f;
     if(largestVal == pointAbs.x()) {
         targetLen = 1.0f / pointAbs.x();
     } else if(largestVal == pointAbs.y()) {

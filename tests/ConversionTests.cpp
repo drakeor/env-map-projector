@@ -11,8 +11,33 @@ const float pi = 3.14159265358979323846f;
 
 TEST_CASE( "ConversionTests", "[conversion]" ) {
 
+// load test image
+    SECTION( "skybox to equirectangular 1" ) {
+
+        ImageReader reader;
+        auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
+        auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
+        auto leftImg = reader.LoadImage("assets/skybox_test_small/left.png");
+        auto rightImg = reader.LoadImage("assets/skybox_test_small/right.png");
+        auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
+        auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
+
+        SkyboxProjection<double> proj;
+        std::shared_ptr<CoordContainerBase<double>> coords = 
+            proj.LoadImageToSphericalCoords(
+                &topImg, &bottomImg,
+                &leftImg, &rightImg, &frontImg, &backImg);
+
+        EquirectangularProjection<double> rectProj;
+        auto newImg = rectProj.ConvertToImage(coords.get(),
+            800, 400);
+
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/skybox_to_equirect_1.png", newImg);
+    }
+
     // load test image
-    SECTION( "skybox to equirectangular" ) {
+    SECTION( "skybox to equirectangular 2" ) {
 
         ImageReader reader;
         auto topImg = reader.LoadImage("assets/skybox/top.jpg");
@@ -30,10 +55,10 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
 
         EquirectangularProjection<double> rectProj;
         auto newImg = rectProj.ConvertToImage(coords.get(),
-            400, 200);
+            800, 400);
 
         ImageWriter writer;
-        writer.SaveImage("assets/testoutput/skybox_to_equirect.png", newImg);
+        writer.SaveImage("assets/testoutput/skybox_to_equirect_2.png", newImg);
     }
 
     SECTION( "equirectangular to skybox" ) {

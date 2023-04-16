@@ -1,4 +1,0 @@
-https://learnopengl.com/Advanced-OpenGL/Cubemaps
-
-License: CC BY 4.0
-From: https://learnopengl.com/About

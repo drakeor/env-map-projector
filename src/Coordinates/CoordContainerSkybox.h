@@ -2,6 +2,7 @@
 #define _COORD_CONTAINER_CARTESIAN_H_
 
 #include "CoordContainerBase.h"
+#include "SkyboxSurf.h"
 #include <memory>
 #include <mutex>
 
@@ -15,7 +16,8 @@ namespace EnvProj
     public:
         CoordContainerSkybox(uint32_t _sideVectorLength);
         bool SetPoint(T x, T y, T z, uint32_t data);
-        
+        bool SetPointDirect(SkyboxSurf surf, T u, T v, uint32_t point);
+
         uint32_t GetClosestPixel(T azim, T evel);
         uint32_t GetClosestPixel(T x, T y, T z);
 
