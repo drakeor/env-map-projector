@@ -11,15 +11,8 @@
 #include "../Utils/EnvMapImage.h"
 #include "../Coordinates/SkyboxSurf.h"
 
-// Flag to also stores the cartesian coordinates
-// Useful for testing and debugging at the expense
-// of longer computation and more memory being used
-#define STORE_CARTESIAN_COORDS
-
 namespace EnvProj
 {
-
-
     template<typename T>
     class SkyboxProjection
     {
@@ -40,7 +33,6 @@ namespace EnvProj
 
     template class SkyboxProjection<float>;
     template class SkyboxProjection<double>;
-
 }
 
 #endif

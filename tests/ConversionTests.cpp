@@ -1,6 +1,7 @@
 #include "../src/Utils/ImageReader.h"
 #include "../src/Utils/ImageWriter.h"
 #include "../src/Projections/SkyboxProjection.h"
+#include "../src/Projections/SkydomeProjection.h"
 #include "../src/Projections/EquirectangularProjection.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
@@ -59,6 +60,31 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/skybox_to_equirect_2.png", newImg);
+    }
+
+    SECTION( "skybox to skydome" ) {
+
+        ImageReader reader;
+        auto topImg = reader.LoadImage("assets/skybox/top.jpg");
+        auto bottomImg = reader.LoadImage("assets/skybox/bottom.jpg");
+        auto leftImg = reader.LoadImage("assets/skybox/left.jpg");
+        auto rightImg = reader.LoadImage("assets/skybox/right.jpg");
+        auto frontImg = reader.LoadImage("assets/skybox/front.jpg");
+        auto backImg = reader.LoadImage("assets/skybox/back.jpg");
+
+        SkyboxProjection<double> proj;
+        std::shared_ptr<CoordContainerBase<double>> coords = 
+            proj.LoadImageToSphericalCoords(
+                &topImg, &bottomImg,
+                &leftImg, &rightImg, &frontImg, &backImg);
+
+        SkydomeProjection<double> destProj;
+        std::array<EnvMapImage, 2> newImgs = destProj.ConvertToImages(
+            coords.get(), 512);
+
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/skybox_to_skydome_top.png", newImgs[0]);
+        writer.SaveImage("assets/testoutput/skybox_to_skydome_bottom.png", newImgs[1]);
     }
 
     SECTION( "equirectangular to skybox" ) {

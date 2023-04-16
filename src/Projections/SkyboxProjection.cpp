@@ -115,15 +115,15 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
     for(int k = 0; k < skyboxImgs.size(); k++)
     {
         Eigen::Vector3i coordMap = CoordConversions<T>::SideToCoordMap(static_cast<SkyboxSurf>(k));
-        float constVal = CoordConversions<T>::SideToConstVal(static_cast<SkyboxSurf>(k));
+        T constVal = CoordConversions<T>::SideToConstVal(static_cast<SkyboxSurf>(k));
 
         // We only need to build this matrix once
         for(int i = 0; i < skyboxImgs[k].GetWidth(); i++)
         {
             for(int j = 0; j < skyboxImgs[k].GetHeight(); j++)
             {
-                float u = (float)i / (float)(skyboxImgs[k].GetWidth() - 1);
-                float v = (float)j / (float)(skyboxImgs[k].GetHeight() - 1);
+                T u = (T)i / (T)(skyboxImgs[k].GetWidth() - 1);
+                T v = (T)j / (T)(skyboxImgs[k].GetHeight() - 1);
 
                 // Convert uv position [0,1] to a coordinates 
                 // on one of the sides [-1,1]. Note that we treat the skybox as a unit cube.
@@ -140,7 +140,7 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
                 cartCoord(1) = uvCoord(coordMap[1]);
                 cartCoord(2) = uvCoord(coordMap[2]);
                 
-                unsigned int pixelData = coords->GetClosestPixel(cartCoord.x(), cartCoord.y(), cartCoord.z());
+                uint32_t pixelData = coords->GetClosestPixel(cartCoord.x(), cartCoord.y(), cartCoord.z());
                 
                 // Lastly, convert to spherical coordinates and store.
                 skyboxImgs[k].SetPixel(i, j, pixelData);
