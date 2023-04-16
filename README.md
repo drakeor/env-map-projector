@@ -29,6 +29,8 @@ CubeMap to Equirectangular Projection (Coming soon)
 
 * (LearnOpenGl.com)[https://learnopengl.com/Advanced-OpenGL/Cubemaps] which is where I got the Skybox from
 
+* (Timothy Oldfield)[https://unsplash.com/@oldfieldart] for the Equirectangular texture.
+
 ## Libraries used:
 
 * STB for image loading: https://github.com/nothings/stb

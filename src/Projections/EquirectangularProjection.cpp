@@ -35,15 +35,9 @@ std::shared_ptr<CoordContainerBase<T>>
     {
         for(int j = 0; j < image->GetHeight(); j++)
         {
-            // Convert to UV coords. Domain: [0,1]
-            float u = (float)i / (float)(image->GetWidth()-1);
-            float v = (float)j / (float)(image->GetHeight()-1);
+            // SphereCoords is a direct mapping, so no conversion needed.
             uint32_t pixelData = image->GetPixel(i, j);
-
-            // Coordinates are stored internally as spherical coordinates
-            // Convert and add to our coordinate collection
-            PointSphere<T> sphericalPt = UVToSpherical(u, v);
-            sphereCoords->SetPoint(sphericalPt.azimuth, sphericalPt.elevation, pixelData);
+            sphereCoords->SetPointDirect(i, j, pixelData);
         }
     }
     

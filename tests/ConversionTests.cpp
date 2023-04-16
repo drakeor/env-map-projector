@@ -90,7 +90,7 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
     SECTION( "equirectangular to skybox" ) {
 
         ImageReader reader;
-        auto testImg = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
+        auto testImg = reader.LoadImage("assets/testimages/equirectangular_image.jpg");
 
         EquirectangularProjection<double> sourceProj;
         std::shared_ptr<CoordContainerBase<double>> coords = 
@@ -98,7 +98,7 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
 
         SkyboxProjection<double> destProj;
         std::array<EnvMapImage, 6> newImgs = destProj.ConvertToImages(
-            coords.get(), 50);
+            coords.get(), 256);
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/equirect_to_skybox_top.png", newImgs[0]);

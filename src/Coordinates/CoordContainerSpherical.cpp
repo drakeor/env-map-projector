@@ -8,9 +8,29 @@ using namespace EnvProj;
 
 const float pi = 3.14159265358979323846f;
  
+template<typename T>
+uint32_t CoordContainerSpherical<T>::GetFinalIndex(uint32_t tex_x, uint32_t tex_y)
+{
+    // Constrain to range
+    if(tex_x < 0)
+        tex_x = 0;
+    if(tex_x >= azimVectorSize)
+        tex_x = azimVectorSize - 1;
+    if(tex_y < 0)
+        tex_y = 0;
+    if(tex_y >= evelVectorSize)
+        tex_y = evelVectorSize - 1;
+        
+
+    uint32_t finalIndex = (tex_y * azimVectorSize + tex_x);
+    if(finalIndex < 0 || finalIndex >= points.size())
+        throw std::range_error("Index is outside the range of size of array!");
+
+    return finalIndex;
+}
 
 template<typename T>
-unsigned int CoordContainerSpherical<T>::AzimElevToIndex(T azim, T evel)
+uint32_t CoordContainerSpherical<T>::AzimElevToIndex(T azim, T evel)
 {
     // Bind to from domains [-pi, pi], [-pi/2,pi/2]
     // to [0, 2pi], [0,pi]
@@ -21,20 +41,7 @@ unsigned int CoordContainerSpherical<T>::AzimElevToIndex(T azim, T evel)
     uint32_t x = (unsigned int)(((fixedazim) / (T)(2*pi)) * (T)azimVectorSize);
     uint32_t y = (unsigned int)(((fixedevel) / (T)(pi)) * (T)evelVectorSize);
 
-    // Constrain to range
-    if(x < 0)
-        x = 0;
-    if(x >= azimVectorSize)
-        x = azimVectorSize - 1;
-    if(y < 0)
-        y = 0;
-    if(y >= evelVectorSize)
-        y = evelVectorSize - 1;
-
-    uint32_t finalIndex = (y* azimVectorSize + x);
-    if(finalIndex < 0 || finalIndex >= points.size())
-        throw std::range_error("Index is outside the range of size of array!");
-
+    uint32_t finalIndex = GetFinalIndex(x, y);
     return finalIndex;
 }
 
@@ -48,6 +55,17 @@ CoordContainerSpherical<T>::CoordContainerSpherical(unsigned int _azimVectorSize
         std::cout << "Allocating container with length " 
         << points.size() << std::endl;
 #endif
+}
+
+template<typename T>
+bool CoordContainerSpherical<T>::SetPointDirect(uint32_t azim, uint32_t evel, uint32_t data)
+{
+    mtx.lock();
+    uint32_t finalIndex = GetFinalIndex(azim, evel);
+    points[finalIndex] = data;
+    mtx.unlock();
+
+    return true;
 }
 
 template<typename T>
