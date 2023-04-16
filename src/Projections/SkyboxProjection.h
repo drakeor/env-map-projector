@@ -36,8 +36,6 @@ namespace EnvProj
             uint32_t sideLength);
             
     private:
-        Eigen::Vector3i SideToCoordMap(SkyboxSurf side);
-        T SideToConstVal(SkyboxSurf side);
     };
 
     template class SkyboxProjection<float>;

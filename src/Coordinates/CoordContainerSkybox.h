@@ -1,8 +1,11 @@
 #ifndef _COORD_CONTAINER_CARTESIAN_H_
 #define _COORD_CONTAINER_CARTESIAN_H_
 
+#include "../../lib/eigen/Eigen/Dense"
 #include "CoordContainerBase.h"
 #include "SkyboxSurf.h"
+
+
 #include <memory>
 #include <mutex>
 
@@ -23,6 +26,7 @@ namespace EnvProj
 
     private:
         uint32_t CartesianToIndex(T x, T y, T z);
+        uint32_t ToFinalIndex(uint32_t sideIndex, uint32_t tex_x, uint32_t tex_y);
 
         std::vector<uint32_t> points;
         std::mutex mtx;

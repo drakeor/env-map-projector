@@ -85,6 +85,7 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "dense": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "core": "cpp"
     }
 }
