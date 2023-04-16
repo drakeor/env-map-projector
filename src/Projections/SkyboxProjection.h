@@ -47,6 +47,9 @@ namespace EnvProj
         T SideToConstVal(SkyboxSurf side);
     };
 
+    template class SkyboxProjection<float>;
+    template class SkyboxProjection<double>;
+
 }
 
 #endif

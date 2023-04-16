@@ -1,4 +1,5 @@
 #include "EquirectangularProjection.h"
+#include "../Coordinates/CoordContainerSpherical.h"
 
 using namespace EnvProj;
 using namespace std;
@@ -27,8 +28,8 @@ std::shared_ptr<CoordContainerBase<T>>
     std::cout << "Attempting to allocate coordinate container of size "
         << totalSize << std::endl;
 
-    std::shared_ptr<SphereCoordsContainer<T>> sphereCoords = 
-        std::make_shared<SphereCoordsContainer<T>>(totalSize);
+    std::shared_ptr<CoordContainerSpherical<T>> sphereCoords = 
+        std::make_shared<CoordContainerSpherical<T>>(image->GetWidth(), image->GetHeight());
 
     for(int i = 0; i < image->GetWidth(); i++)
     {
@@ -85,8 +86,8 @@ template<typename T>
 PointSphere<T> EquirectangularProjection<T>::UVToSpherical(T u, T v)
 {
     PointSphere<T> newPoint;
-    newPoint.azimuth = (inputPt.x * 2.0f * pi) - pi;
-    newPoint.elevation = (inputPt.y * pi) - (pi/2);
+    newPoint.azimuth = (u * 2.0f * pi) - pi;
+    newPoint.elevation = (v * pi) - (pi/2);
 
     return newPoint;
 }

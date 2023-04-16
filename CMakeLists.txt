@@ -12,6 +12,7 @@ set(SourceFiles
     src/Coordinates/CoordConversions.cpp
     src/Coordinates/CoordContainerSkybox.cpp
     src/Coordinates/CoordContainerSpherical.cpp
+    src/Projections/EquirectangularProjection.cpp
     src/Utils/EnvMapImage.cpp
     src/Utils/ImageReader.cpp
     src/Utils/ImageWriter.cpp
@@ -28,6 +29,7 @@ add_executable (envmapproj_tests
     tests/CoordConversionTests.cpp
     tests/CoordContainerSphericalTests.cpp
     tests/EnvMapImageTests.cpp 
+    tests/EquirectangularProjectionTests.cpp
     tests/ImageReaderTests.cpp 
     tests/ImageWriterTests.cpp
     ${SourceFiles}

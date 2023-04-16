@@ -29,6 +29,9 @@ namespace EnvProj
 
     private:
     };
+
+    template class EquirectangularProjection<float>;
+    template class EquirectangularProjection<double>;
 }
 
 #endif

@@ -32,7 +32,7 @@ TEST_CASE( "CoordContainerSkybox", "[coords-container-skybox]" ) {
     }
 
     // Hitting near a point should work
-    SECTION( "direct detect" ) {
+    SECTION( "hit near detect" ) {
 
         CoordContainerSkybox<float> coords(10);
 

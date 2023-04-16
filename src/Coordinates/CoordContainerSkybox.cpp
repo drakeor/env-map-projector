@@ -102,9 +102,10 @@ bool CoordContainerSkybox<T>::SetPoint(T x, T y, T z, uint32_t point)
     uint32_t index = CartesianToIndex(x, y, z);
     points[index] = point;
     mtx.unlock();
-
+#ifdef DEBUG_PRINT_COORD_CONTAINER_SKYBOX
     std::cout << "Set Point: " << index << std::endl;
-        
+#endif
+
     return true;
 }
 
@@ -148,13 +149,14 @@ uint32_t CoordContainerSkybox<T>::GetClosestPixel(T x, T y, T z)
     uint32_t data = points[index];
     mtx.unlock();
 
+#ifdef DEBUG_PRINT_COORD_CONTAINER_SKYBOX
     std::cout << "Translated Point: " 
         << scaledPoint.x() << ", "
         << scaledPoint.y() << ", "
         << scaledPoint.z() << std::endl;
 
     std::cout << "Get Point: " << index << std::endl;
-
+#endif
 
     return data;
 }

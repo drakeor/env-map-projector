@@ -5,7 +5,7 @@
 #include <memory>
 #include <mutex>
 
-#define DEBUG_PRINT_COORD_CONTAINER_SKYBOX
+//#define DEBUG_PRINT_COORD_CONTAINER_SKYBOX
 
 namespace EnvProj
 {
