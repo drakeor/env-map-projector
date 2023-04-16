@@ -64,14 +64,15 @@ TEST_CASE( "CoordContainerSkybox", "[coords-container-skybox]" ) {
         CoordContainerSkybox<float> coords(80);
 
         coords.SetPoint(1, 0, 0, 0x000000AA);
-        coords.SetPoint(0, 1, 0, 0x000000BB);
-        coords.SetPoint(0, 0, 1, 0x000000CC);
-        coords.SetPoint(-1, -1, 1, 0x000000DD);
-
         REQUIRE( coords.GetClosestPixel(0, 0) == 0x000000AA );
-        //REQUIRE( coords.GetClosestPixel(0, 1.5708f) == 0x000000BB );
-        REQUIRE( coords.GetClosestPixel(1.6f, 0) == 0x000000BB );
-        REQUIRE( coords.GetClosestPixel(0, 1.5708f) == 0x000000CC );
+
+        coords.SetPoint(0, 1, 0, 0x000000BB);
+        REQUIRE( coords.GetClosestPixel(1.5608f, 0) == 0x000000BB );
+        
+        coords.SetPoint(0, 0, 1, 0x000000CC);
+        REQUIRE( coords.GetClosestPixel(0, 1.57f) == 0x000000CC );
+        
+        coords.SetPoint(-0.98f, -0.98f, 1, 0x000000DD);
         REQUIRE( coords.GetClosestPixel(-2.3562f, 0.6155f) == 0x000000DD );
 
     }
