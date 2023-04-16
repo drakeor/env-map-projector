@@ -21,7 +21,6 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
             = proj.LoadImageToSphericalCoords(&img);
     }
 
-    // UV To Spherical and back should be reversable.
     SECTION( "samesize" ) {
 
         ImageReader reader;
@@ -37,4 +36,33 @@ TEST_CASE( "EquirectangularProjection", "[equirectangular-projection]" ) {
         writer.SaveImage("assets/testoutput/test_samesize_equirect.png", newImg);
     }
  
+    SECTION( "downsize" ) {
+
+        ImageReader reader;
+        auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
+        
+        EquirectangularProjection<float> proj;
+        std::shared_ptr<CoordContainerBase<float>> coords
+            = proj.LoadImageToSphericalCoords(&img);
+
+        auto newImg = proj.ConvertToImage(coords.get(), img.GetWidth()/2, img.GetHeight()/2);
+        
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/test_downsize_equirect.png", newImg);
+    }
+
+    SECTION( "upsize" ) {
+
+        ImageReader reader;
+        auto img = reader.LoadImage("assets/testimages/pixel_equirectangle_test.png");
+        
+        EquirectangularProjection<float> proj;
+        std::shared_ptr<CoordContainerBase<float>> coords
+            = proj.LoadImageToSphericalCoords(&img);
+
+        auto newImg = proj.ConvertToImage(coords.get(), img.GetWidth()*2, img.GetHeight()*2);
+        
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/test_upsize_equirect.png", newImg);
+    }
 }

@@ -1,6 +1,8 @@
 #include "CoordContainerSpherical.h"
 #include "CoordConversions.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace EnvProj;
 
@@ -10,9 +12,14 @@ const float pi = 3.14159265358979323846f;
 template<typename T>
 unsigned int CoordContainerSpherical<T>::AzimElevToIndex(T azim, T evel)
 {
+    // Bind to from domains [-pi, pi], [-pi/2,pi/2]
+    // to [0, 2pi], [0,pi]
+    T fixedazim = azim + (T)pi;
+    T fixedevel = evel + (T)pi/(T)2.0f;
+
     // Convert azim/evel to coordinates
-    unsigned int x = (unsigned int)((azim / (T)(2*pi)) * (T)azimVectorSize);
-    unsigned int y = (unsigned int)((evel / (T)(pi)) * (T)evelVectorSize);
+    uint32_t x = (unsigned int)(((fixedazim) / (T)(2*pi)) * (T)azimVectorSize);
+    uint32_t y = (unsigned int)(((fixedevel) / (T)(pi)) * (T)evelVectorSize);
 
     // Constrain to range
     if(x < 0)

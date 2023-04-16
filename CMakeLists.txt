@@ -16,6 +16,7 @@ set(SourceFiles
     src/Utils/EnvMapImage.cpp
     src/Utils/ImageReader.cpp
     src/Utils/ImageWriter.cpp
+    src/Projections/SkyboxProjection.cpp
 )
 
 add_executable (envmapproj 
@@ -25,6 +26,7 @@ add_executable (envmapproj
 
 add_executable (envmapproj_tests 
     tests/test_main.cpp 
+    tests/ConversionTests.cpp
     tests/CoordContainerSkyboxTests.cpp
     tests/CoordConversionTests.cpp
     tests/CoordContainerSphericalTests.cpp
@@ -32,6 +34,7 @@ add_executable (envmapproj_tests
     tests/EquirectangularProjectionTests.cpp
     tests/ImageReaderTests.cpp 
     tests/ImageWriterTests.cpp
+    tests/SkyboxProjectionTests.cpp
     ${SourceFiles}
 )
 

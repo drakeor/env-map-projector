@@ -89,6 +89,7 @@ PointSphere<T> EquirectangularProjection<T>::UVToSpherical(T u, T v)
     newPoint.azimuth = (u * 2.0f * pi) - pi;
     newPoint.elevation = (v * pi) - (pi/2);
 
+    //std::cout << newPoint.azimuth << "," << newPoint.elevation << std::endl;
     return newPoint;
 }
 

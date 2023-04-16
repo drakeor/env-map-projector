@@ -88,8 +88,12 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
 
     uint32_t finalIndex = (sideIndex * sideVectorLength * sideVectorLength) 
         + (tex_y * sideVectorLength) + tex_x;
-    if(finalIndex < 0 || finalIndex >= points.size())
+        
+    if(finalIndex < 0 || finalIndex >= points.size()) {
+        std::cout << "Attempting to access index " << finalIndex << std::endl;
+        std::cout << "Size of array is " << points.size() << std::endl;
         throw std::range_error("Index is outside the range of size of array!");
+    }
 
     return finalIndex;
 }

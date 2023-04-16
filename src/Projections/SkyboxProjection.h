@@ -5,7 +5,7 @@
 #include <vector>
 #include <array>
 
-#include "../lib/eigen/Eigen/Dense"
+#include "../../lib/eigen/Eigen/Dense"
 
 #include "../Coordinates/CoordContainerBase.h"
 #include "../Utils/EnvMapImage.h"
@@ -40,7 +40,7 @@ namespace EnvProj
             EnvMapImage* frontImage, EnvMapImage* backImage);
             
         std::array<EnvMapImage, 6> ConvertToImages(CoordContainerBase<T>* coords,
-            uint32_t width, uint32_t height);
+            uint32_t sideLength);
             
     private:
         Eigen::Vector3i SideToCoordMap(SkyboxSurf side);
