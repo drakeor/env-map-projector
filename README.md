@@ -31,6 +31,8 @@ CubeMap to Equirectangular Projection (Coming soon)
 
 * (Timothy Oldfield)[https://unsplash.com/@oldfieldart] for the Equirectangular texture.
 
+*(Tutorials for Blender3d)[https://tutorialsforblender3d.com/] for the skysphere texture.
+
 ## Libraries used:
 
 * STB for image loading: https://github.com/nothings/stb

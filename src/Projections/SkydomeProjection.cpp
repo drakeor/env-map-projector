@@ -1,5 +1,5 @@
 #include "SkydomeProjection.h"
-#include "../Coordinates/CoordContainerSpherical.h"
+#include "../Coordinates/CoordContainerHemiSpherical.h"
 
 using namespace EnvProj;
 using namespace std;
@@ -22,14 +22,40 @@ template <typename T>
 std::shared_ptr<CoordContainerBase<T>> 
     SkydomeProjection<T>::LoadImageToSphericalCoords(EnvMapImage* topImage, EnvMapImage* bottomImage)
 {
-    //int totalSize = 0;
-    //(topImage->GetHeight() * topImage->GetWidth());
+    // Grab the total size along with doing some sanity checks
+    int vectorSideLen = 0;
+    if(topImage != nullptr)
+    {
+        vectorSideLen = topImage->GetWidth();
+        if(topImage->GetWidth() != topImage->GetHeight())
+            throw std::range_error("topImage width must equal height!");
+    }
+    if(bottomImage != nullptr)
+    {
+        vectorSideLen = bottomImage->GetWidth();
+         
+        if(bottomImage->GetWidth() != bottomImage->GetHeight())
+            throw std::range_error("bottomImage width must equal height!");
+        if(topImage != nullptr && topImage->GetWidth() != bottomImage->GetWidth())
+            throw std::range_error("bottomImage dimensions must equal topImage dimensions!");
 
-    std::shared_ptr<CoordContainerSpherical<T>> sphereCoords = 
-    std::make_shared<CoordContainerSpherical<T>>(20, 20);
+    }
 
+    std::shared_ptr<CoordContainerHemiSpherical<T>> sphereCoords = 
+        std::make_shared<CoordContainerHemiSpherical<T>>(vectorSideLen);
 
-    // TODO: Implement this
+    for(uint32_t i = 0; i < vectorSideLen; i++) {
+        for(uint32_t j = 0; j < vectorSideLen; j++) {
+            if(topImage != nullptr) {
+                uint32_t topData = topImage->GetPixel(i, j);
+                sphereCoords->SetPointDirect(TopHemiSurf, i, j, topData);
+            }
+            if(bottomImage != nullptr) {
+                uint32_t bottomData = bottomImage->GetPixel(i, j);
+                sphereCoords->SetPointDirect(BottomHemiSurf, i, j, bottomData);
+            }
+        }
+    }
 
 
     // I'll have to check if this ref-counts correctly...
@@ -62,15 +88,12 @@ std::array<EnvMapImage,2> SkydomeProjection<T>::ConvertToImages(CoordContainerBa
             T v = (((T)offset_j) / (T)imageSideLength) * pi;
 
             // Get distance and angle of resultant vector
-            T dist = u*u + v*v;
+            T dist = sqrtf(u*u + v*v);
             T angle = atan2f(v, u);
 
-            // We only care if the dist^2 <= pi^2
-            if(angle >= (pi*pi))
+            // We only care if the dist <= pi
+            if(dist > pi)
                 continue;
-
-            // Do the expensive sqrtf only after we know we need this.
-            dist = sqrtf(dist);
             
             // Distance is our elevation coordinate.
             // Angle is our Azimuth coordinate

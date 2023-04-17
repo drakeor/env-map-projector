@@ -108,4 +108,23 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
         writer.SaveImage("assets/testoutput/equirect_to_skybox_front.png", newImgs[4]);
         writer.SaveImage("assets/testoutput/equirect_to_skybox_back.png", newImgs[5]);
     }
+
+    
+    SECTION( "skydome to equirectangular" ) {
+
+        ImageReader reader;
+        auto topImg = reader.LoadImage("assets/testimages/delete_this.jpg");
+        auto bottomImg = reader.LoadImage("assets/testimages/delete_this.jpg");
+
+        SkydomeProjection<double> sourceProj;
+        std::shared_ptr<CoordContainerBase<double>> coords = 
+            sourceProj.LoadImageToSphericalCoords(&topImg, &bottomImg);
+
+        EquirectangularProjection<double> rectProj;
+        auto newImg = rectProj.ConvertToImage(coords.get(),
+            800, 400);
+
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/skydome_to_equirect.png", newImg);
+    }
 }

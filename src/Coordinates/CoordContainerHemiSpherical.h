@@ -7,7 +7,7 @@
 #include <vector>
 #include <mutex>
 
-#define DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
+//#define DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
 
 namespace EnvProj
 {

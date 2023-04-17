@@ -11,15 +11,21 @@ const float pi = 3.14159265358979323846f;
 TEST_CASE( "SkydomeProjection", "[skydome-projection]" ) {
 
     // load test image
-    SECTION( "loading all" ) {
+    SECTION( "loading top" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
-        auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
+        auto topImg = reader.LoadImage("assets/testimages/delete_this.jpg");
 
         SkydomeProjection<float> proj;
-        /*std::shared_ptr<CoordContainerBase<float>> coords = 
+        std::shared_ptr<CoordContainerBase<float>> coords = 
             proj.LoadImageToSphericalCoords(
-                &topImg, &bottomImg);*/
+                &topImg, nullptr);
+
+        std::array<EnvMapImage, 2> newImgs = proj.ConvertToImages(
+            coords.get(), 256);
+            
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/skydome_top_test.png", newImgs[0]);
+        writer.SaveImage("assets/testoutput/skydome_bottom_test.png", newImgs[1]);
     }
 }
