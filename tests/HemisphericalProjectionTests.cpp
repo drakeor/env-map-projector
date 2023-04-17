@@ -1,6 +1,6 @@
 #include "../src/Utils/ImageReader.h"
 #include "../src/Utils/ImageWriter.h"
-#include "../src/Projections/SkydomeProjection.h"
+#include "../src/Projections/HemisphericalProjection.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 
@@ -8,7 +8,7 @@ using namespace EnvProj;
 
 const float pi = 3.14159265358979323846f;
 
-TEST_CASE( "SkydomeProjection", "[skydome-projection]" ) {
+TEST_CASE( "HemisphericalProjection", "[hemispherical-projection]" ) {
 
     // load test image
     SECTION( "loading top" ) {
@@ -16,7 +16,7 @@ TEST_CASE( "SkydomeProjection", "[skydome-projection]" ) {
         ImageReader reader;
         auto topImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
 
-        SkydomeProjection<float> proj;
+        HemisphericalProjection<float> proj;
         std::shared_ptr<CoordContainerBase<float>> coords = 
             proj.LoadImageToSphericalCoords(
                 &topImg, nullptr);

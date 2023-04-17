@@ -1,5 +1,5 @@
-#ifndef _SKYDOME_PROJECTION_H_
-#define _SKYDOME_PROJECTION_H_
+#ifndef _HEMISPHERICAL_PROJECTION_H_
+#define _HEMISPHERICAL_PROJECTION_H_
 
 #include <iostream>
 #include <vector>
@@ -15,11 +15,11 @@
 namespace EnvProj
 {
     template <typename T>
-    class SkydomeProjection
+    class HemisphericalProjection
     {
     public:
-        SkydomeProjection();
-        ~SkydomeProjection();
+        HemisphericalProjection();
+        ~HemisphericalProjection();
 
         std::shared_ptr<CoordContainerBase<T>> 
             LoadImageToSphericalCoords(EnvMapImage* topImage, EnvMapImage* bottomImage);
@@ -31,8 +31,8 @@ namespace EnvProj
     private:
     };
 
-    template class SkydomeProjection<float>;
-    template class SkydomeProjection<double>;
+    template class HemisphericalProjection<float>;
+    template class HemisphericalProjection<double>;
 }
 
 #endif

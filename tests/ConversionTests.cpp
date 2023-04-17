@@ -1,7 +1,7 @@
 #include "../src/Utils/ImageReader.h"
 #include "../src/Utils/ImageWriter.h"
 #include "../src/Projections/SkyboxProjection.h"
-#include "../src/Projections/SkydomeProjection.h"
+#include "../src/Projections/HemisphericalProjection.h"
 #include "../src/Projections/EquirectangularProjection.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
@@ -78,7 +78,7 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
                 &topImg, &bottomImg,
                 &leftImg, &rightImg, &frontImg, &backImg);
 
-        SkydomeProjection<double> destProj;
+        HemisphericalProjection<double> destProj;
         std::array<EnvMapImage, 2> newImgs = destProj.ConvertToImages(
             coords.get(), 512);
 
@@ -116,7 +116,7 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
         auto topImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
         auto bottomImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
 
-        SkydomeProjection<double> sourceProj;
+        HemisphericalProjection<double> sourceProj;
         std::shared_ptr<CoordContainerBase<double>> coords = 
             sourceProj.LoadImageToSphericalCoords(&topImg, &bottomImg);
 

@@ -1,4 +1,4 @@
-#include "SkydomeProjection.h"
+#include "HemisphericalProjection.h"
 #include "../Coordinates/CoordContainerHemiSpherical.h"
 
 using namespace EnvProj;
@@ -7,20 +7,20 @@ using namespace std;
 const float pi = 3.14159265358979323846f;
 
 template <typename T>
-SkydomeProjection<T>::SkydomeProjection()
+HemisphericalProjection<T>::HemisphericalProjection()
 {
 
 }
 
 template <typename T>
-SkydomeProjection<T>::~SkydomeProjection()
+HemisphericalProjection<T>::~HemisphericalProjection()
 {
 
 }
 
 template <typename T>
 std::shared_ptr<CoordContainerBase<T>> 
-    SkydomeProjection<T>::LoadImageToSphericalCoords(EnvMapImage* topImage, EnvMapImage* bottomImage)
+    HemisphericalProjection<T>::LoadImageToSphericalCoords(EnvMapImage* topImage, EnvMapImage* bottomImage)
 {
     // Grab the total size along with doing some sanity checks
     int vectorSideLen = 0;
@@ -64,7 +64,7 @@ std::shared_ptr<CoordContainerBase<T>>
 }
 
 template <typename T>
-std::array<EnvMapImage,2> SkydomeProjection<T>::ConvertToImages(CoordContainerBase<T>* coords,
+std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordContainerBase<T>* coords,
     uint32_t imageSideLength)
 {
     // TODO: We should error check that coords actually has points?
@@ -110,7 +110,7 @@ std::array<EnvMapImage,2> SkydomeProjection<T>::ConvertToImages(CoordContainerBa
 }
 
 template <typename T>
-PointSphere<T> SkydomeProjection<T>::UVToSpherical(T u, T v)
+PointSphere<T> HemisphericalProjection<T>::UVToSpherical(T u, T v)
 {
     PointSphere<T> newPoint;
     newPoint.azimuth = (u * 2.0f * pi) - pi;
