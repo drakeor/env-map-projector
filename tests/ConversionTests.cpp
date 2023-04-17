@@ -113,8 +113,8 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
     SECTION( "skydome to equirectangular" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/testimages/delete_this.jpg");
-        auto bottomImg = reader.LoadImage("assets/testimages/delete_this.jpg");
+        auto topImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
+        auto bottomImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
 
         SkydomeProjection<double> sourceProj;
         std::shared_ptr<CoordContainerBase<double>> coords = 

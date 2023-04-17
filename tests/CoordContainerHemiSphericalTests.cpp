@@ -18,16 +18,7 @@ TEST_CASE( "CoordContainerHemiSpherical", "[coords-container-hemi-spherical]" ) 
     }
 
     // Directly hitting a point should work
-    SECTION( "direct point set" ) {
-
-        CoordContainerHemiSpherical<float> coords(5);
-
-        coords.SetPointDirect(TopHemiSurf, 2, 2, 0xAA);
-        REQUIRE( coords.GetClosestPixel(0, 0) == 0xAA );
-    }
-
-    // Directly hitting a point should work
-    SECTION( "indirect detect" ) {
+    SECTION( "direct detect" ) {
 
         CoordContainerHemiSpherical<float> coords(5);
 

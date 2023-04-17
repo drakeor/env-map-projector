@@ -42,9 +42,43 @@ uint32_t CoordContainerHemiSpherical<T>::GetFinalIndex(HemisphereSurf surf, uint
     return finalIndex;
 }
 
+
+/*
 template<typename T>
 uint32_t CoordContainerHemiSpherical<T>::AzimElevToIndex(T azim, T evel)
 {
+    Eigen::Vector3<T> point = CoordConversions<T>::SphericalToCartesian({azim, evel});
+
+
+    // If the evel < 0, it's on the bottom surface
+    HemisphereSurf surf = TopHemiSurf;
+    if(point.z() < 0)
+        surf = BottomHemiSurf;
+
+    // Convert azim/evel to a point on the UV
+    // This is literally just taking the vector where
+    // azim is the angle and evel is the length.
+    T evel_abs = fabs(evel);
+    T u = point.x()/2.0f + 0.5f;
+    T v = point.y()/2.0f + 0.5f;
+
+#ifdef DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
+    std::cout << "u: " << u << ", v: " << v << std::endl;
+#endif
+
+    uint32_t tex_x = (uint32_t)(u * (T)vectorSize);
+    uint32_t tex_y = (uint32_t)(v * (T)vectorSize);
+
+    uint32_t finalIndex = GetFinalIndex(surf, tex_x, tex_y);
+    return finalIndex;
+}*/
+
+
+template<typename T>
+uint32_t CoordContainerHemiSpherical<T>::AzimElevToIndex(T azim, T evel)
+{
+    Eigen::Vector3<T> point = CoordConversions<T>::SphericalToCartesian({azim, evel});
+
 
     // If the evel < 0, it's on the bottom surface
     HemisphereSurf surf = TopHemiSurf;
@@ -75,18 +109,6 @@ uint32_t CoordContainerHemiSpherical<T>::AzimElevToIndex(T azim, T evel)
 
     uint32_t finalIndex = GetFinalIndex(surf, tex_x, tex_y);
     return finalIndex;
-/*
-    // Bind to from domains [-pi, pi], [-pi/2,pi/2]
-    // to [0, 2pi], [0,pi]
-    T fixedazim = azim + (T)pi;
-    T fixedevel = evel + (T)pi/(T)2.0f;
-
-    // Convert azim/evel to coordinates
-    uint32_t x = (unsigned int)(((fixedazim) / (T)(2*pi)) * (T)azimVectorSize);
-    uint32_t y = (unsigned int)(((fixedevel) / (T)(pi)) * (T)evelVectorSize);
-
-    uint32_t finalIndex = GetFinalIndex(surf, x, y);
-    return finalIndex;*/
 }
 
 template<typename T>

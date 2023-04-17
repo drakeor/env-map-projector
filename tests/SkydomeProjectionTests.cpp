@@ -14,7 +14,7 @@ TEST_CASE( "SkydomeProjection", "[skydome-projection]" ) {
     SECTION( "loading top" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/testimages/delete_this.jpg");
+        auto topImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
 
         SkydomeProjection<float> proj;
         std::shared_ptr<CoordContainerBase<float>> coords = 
