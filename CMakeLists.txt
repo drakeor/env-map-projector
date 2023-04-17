@@ -12,6 +12,7 @@ set(SourceFiles
     src/Coordinates/CoordConversions.cpp
     src/Coordinates/CoordContainerSkybox.cpp
     src/Coordinates/CoordContainerSpherical.cpp
+    src/Coordinates/CoordContainerHemiSpherical.cpp
     src/Projections/EquirectangularProjection.cpp
     src/Projections/SkyboxProjection.cpp
     src/Projections/SkydomeProjection.cpp
@@ -31,6 +32,7 @@ add_executable (envmapproj_tests
     tests/CoordContainerSkyboxTests.cpp
     tests/CoordConversionTests.cpp
     tests/CoordContainerSphericalTests.cpp
+    tests/CoordContainerHemiSphericalTests.cpp
     tests/EnvMapImageTests.cpp 
     tests/EquirectangularProjectionTests.cpp
     tests/ImageReaderTests.cpp 
