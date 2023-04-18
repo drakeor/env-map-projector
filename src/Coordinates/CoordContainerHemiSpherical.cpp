@@ -42,36 +42,7 @@ uint32_t CoordContainerHemiSpherical<T>::GetFinalIndex(HemisphereSurf surf, uint
     return finalIndex;
 }
 
-
 /*
-template<typename T>
-uint32_t CoordContainerHemiSpherical<T>::AzimElevToIndex(T azim, T evel)
-{
-    Eigen::Vector3<T> point = CoordConversions<T>::SphericalToCartesian({azim, evel});
-
-
-    // If the evel < 0, it's on the bottom surface
-    HemisphereSurf surf = TopHemiSurf;
-    if(point.z() < 0)
-        surf = BottomHemiSurf;
-
-    // Convert azim/evel to a point on the UV
-    // This is literally just taking the vector where
-    // azim is the angle and evel is the length.
-    T evel_abs = fabs(evel);
-    T u = point.x()/2.0f + 0.5f;
-    T v = point.y()/2.0f + 0.5f;
-
-#ifdef DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
-    std::cout << "u: " << u << ", v: " << v << std::endl;
-#endif
-
-    uint32_t tex_x = (uint32_t)(u * (T)vectorSize);
-    uint32_t tex_y = (uint32_t)(v * (T)vectorSize);
-
-    uint32_t finalIndex = GetFinalIndex(surf, tex_x, tex_y);
-    return finalIndex;
-}*/
 
 
 template<typename T>
@@ -109,7 +80,7 @@ uint32_t CoordContainerHemiSpherical<T>::AzimElevToIndex(T azim, T evel)
 
     uint32_t finalIndex = GetFinalIndex(surf, tex_x, tex_y);
     return finalIndex;
-}
+}*/
 
 template<typename T>
 CoordContainerHemiSpherical<T>::CoordContainerHemiSpherical(uint32_t _vectorSize)
@@ -138,6 +109,7 @@ bool CoordContainerHemiSpherical<T>::SetPointDirect(HemisphereSurf surf, uint32_
     return true;
 }
 
+/*
 template<typename T>
 bool CoordContainerHemiSpherical<T>::SetPoint(T azim, T evel, uint32_t data)
 {
@@ -152,32 +124,47 @@ bool CoordContainerHemiSpherical<T>::SetPoint(T azim, T evel, uint32_t data)
 #endif
 
     return true;
-}
+}*/
 
 template<typename T>
-uint32_t CoordContainerHemiSpherical<T>::GetClosestPixel(T azim, T evel)
+uint32_t CoordContainerHemiSpherical<T>::GetClosestPixel(T azim, T elev)
 {
-    // Grab point directly
-    mtx.lock();
-    auto i = AzimElevToIndex(azim, evel);
-    auto point =  points[i];
-    mtx.unlock();
-
-#ifdef DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
-    std::cout << "Get Point " 
-        << i << std::endl;
-#endif
-
-    return point;
+    PointSphere<T> pointSphere;
+    pointSphere.azimuth = azim;
+    pointSphere.elevation = elev;
+    
+    Eigen::Vector3<T> pointCart = CoordConversions<T>::SphericalToCartesian(pointSphere);
+    return GetClosestPixel(pointCart.x(), pointCart.y(), pointCart.z());
 }
 
 template<typename T>
 uint32_t CoordContainerHemiSpherical<T>::GetClosestPixel(T x, T y, T z)
 {
-    // Convert point to spherical and pass to above function
-    Eigen::Vector3<T> pointCart(x, y, z);
-    PointSphere<T> pointSphere = CoordConversions<T>::CartesianToSpherical(pointCart);
-    return GetClosestPixel(pointSphere.azimuth, pointSphere.elevation);
+    // z-coordinate gives us the top/bottom surface.
+    HemisphereSurf surf = TopHemiSurf;
+    if(z < 0)
+        surf = BottomHemiSurf;
+
+    // Convert domain from [-1,1] -> [0,1]
+    T u = (x + 1.0f) * 0.5f;
+    T v = (y + 1.0f) * 0.5f;
+
+    // Convert from [0,1] -> [0, vectorSize]
+    uint32_t tex_x = (uint32_t)roundf(u * vectorSize);
+    uint32_t tex_y = (uint32_t)roundf(v * vectorSize);
+
+    // Grab the point 
+    mtx.lock();
+    uint32_t finalIndex = GetFinalIndex(surf, tex_x, tex_y);
+    auto point = points[finalIndex];
+    mtx.unlock();
+
+#ifdef DEBUG_PRINT_COORD_CONTAINER_HEMISPHERICAL
+    std::cout << "Get Point " 
+        << finalIndex << std::endl;
+#endif
+
+    return point;
 }
 
 

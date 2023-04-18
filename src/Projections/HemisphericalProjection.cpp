@@ -74,31 +74,36 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
     };
 
     // We're going to write to the top and bottom image at the same time.
+    // This is easiest with cartesian coordinates
     for(int i = 0; i < imageSideLength; i++)
     {
         for(int j = 0; j < imageSideLength; j++)
         {
+            // Convert from [0, imageSideLength] to [0, 1]
+            T x_coord = (T)i / ((T)imageSideLength - 1.0f);
+            T y_coord = (T)j / ((T)imageSideLength - 1.0f);
 
-            // Convert from [0, imageSideLength] to [-imageSideLength/2, imageSideLength/2]
-            int offset_i = i - (imageSideLength / 2);
-            int offset_j = j - (imageSideLength / 2);
+            // Convert from [0, 1] to [-1, 1]
+            x_coord = 2.0f*(x_coord - 0.5f);
+            y_coord = 2.0f*(y_coord - 0.5f);
 
-            // Convert to domain [-pi, pi]
-            T u = (((T)offset_i) / (T)imageSideLength) * pi;
-            T v = (((T)offset_j) / (T)imageSideLength) * pi;
-
-            // Get distance and angle of resultant vector
-            T dist = sqrtf(u*u + v*v);
-            T angle = atan2f(v, u);
-
-            // We only care if the dist <= pi
-            if(dist > pi)
+            // Only worry about getting coordinates and setting pixels
+            // if the L2 <= 1
+            T len_squared = x_coord*x_coord + y_coord*y_coord;
+            if(len_squared > 1.0f) {
+                skydomeImages[0].SetPixel(i, j, 0x00);
+                skydomeImages[1].SetPixel(i, j, 0x00);
                 continue;
-            
-            // Distance is our elevation coordinate.
-            // Angle is our Azimuth coordinate
-            uint32_t pixelDataTop = coords->GetClosestPixel(angle, dist - pi/2);
-            uint32_t pixelDataBottom = coords->GetClosestPixel(angle, dist + pi/2);
+            }
+
+            // Derive z coordinate by re-arranging the equation for 
+            // a unit sphere.
+            T z_coord = sqrtf(1.0f - len_squared);
+
+            //std::cout << len_squared << "," << z_coord << std::endl;
+
+            uint32_t pixelDataTop = coords->GetClosestPixel(x_coord, y_coord, z_coord);
+            uint32_t pixelDataBottom = coords->GetClosestPixel(x_coord, y_coord, -z_coord);
 
             // Set pixel in the final UV image
             skydomeImages[0].SetPixel(i, j, pixelDataTop);
@@ -109,6 +114,7 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
     return skydomeImages;
 }
 
+/*
 template <typename T>
 PointSphere<T> HemisphericalProjection<T>::UVToSpherical(T u, T v)
 {
@@ -119,3 +125,4 @@ PointSphere<T> HemisphericalProjection<T>::UVToSpherical(T u, T v)
     //std::cout << newPoint.azimuth << "," << newPoint.elevation << std::endl;
     return newPoint;
 }
+*/

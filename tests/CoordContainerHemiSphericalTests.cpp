@@ -22,20 +22,43 @@ TEST_CASE( "CoordContainerHemiSpherical", "[coords-container-hemi-spherical]" ) 
 
         CoordContainerHemiSpherical<float> coords(5);
 
-        coords.SetPoint(0, 0, 0xAA);
-        REQUIRE( coords.GetClosestPixel(0, 0) == 0xAA );
+        coords.SetPointDirect(TopHemiSurf, 0, 0, 0xAA);
+        REQUIRE( coords.GetClosestPixel(-1, -1, 1) == 0xAA );
 
-        coords.SetPoint(0, -1.0f, 0xBB);
-        REQUIRE( coords.GetClosestPixel(0, -1.0f) == 0xBB );
+        coords.SetPointDirect(BottomHemiSurf, 0, 0, 0xBB);
+        REQUIRE( coords.GetClosestPixel(-1, -1, -1) == 0xBB );
 
-        coords.SetPoint(0, 1.5f, 0xCC);
-        REQUIRE( coords.GetClosestPixel(0, 1.5f) == 0xCC );
+        coords.SetPointDirect(TopHemiSurf, 4, 4, 0xCC);
+        REQUIRE( coords.GetClosestPixel(1, 1, 1) == 0xCC );
 
-        coords.SetPoint(3.0f, 1.5f, 0xDD);
-        REQUIRE( coords.GetClosestPixel(3.0f, 1.5f) == 0xDD );
+        coords.SetPointDirect(BottomHemiSurf, 4, 4, 0xDD);
+        REQUIRE( coords.GetClosestPixel(1, 1, -1) == 0xDD);
 
-        coords.SetPoint(-1.5f, -1.5f, 0xEE);
-        REQUIRE( coords.GetClosestPixel(-1.5f, -1.5f) == 0xEE );
+    }
+
+    // Indirectly hitting a point should work
+    SECTION( "indirect detect" ) {
+
+        CoordContainerHemiSpherical<float> coords(5);
+
+        coords.SetPointDirect(TopHemiSurf, 2, 2, 0xCC);
+        REQUIRE( coords.GetClosestPixel(-0.25f, -0.25f, 0.75f) == 0xCC );
+
+        coords.SetPointDirect(BottomHemiSurf, 3, 3, 0xDD);
+        REQUIRE( coords.GetClosestPixel(0.25f, 0.25f, -0.75f) == 0xDD);
+
+    }
+
+    SECTION( "spherical to cartesian detect" ) {
+
+        CoordContainerHemiSpherical<float> coords(5);
+
+        coords.SetPointDirect(TopHemiSurf, 4, 3, 0xEE);
+        REQUIRE( coords.GetClosestPixel(0.1f,0) == 0xEE);
+
+        coords.SetPointDirect(BottomHemiSurf, 3, 3, 0xFF);
+        REQUIRE( coords.GetClosestPixel(0.1f,-pi/2+0.01f) == 0xFF);
+
     }
 
 }
