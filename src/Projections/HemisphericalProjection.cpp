@@ -48,11 +48,13 @@ std::shared_ptr<CoordContainerBase<T>>
         for(uint32_t j = 0; j < vectorSideLen; j++) {
             if(topImage != nullptr) {
                 uint32_t topData = topImage->GetPixel(i, j);
-                sphereCoords->SetPointDirect(TopHemiSurf, i, j, topData);
+                // For whatever reason, we store the top to bottom and vice versa when loading.
+                sphereCoords->SetPointDirect(BottomHemiSurf, i, j, topData);
             }
             if(bottomImage != nullptr) {
                 uint32_t bottomData = bottomImage->GetPixel(i, j);
-                sphereCoords->SetPointDirect(BottomHemiSurf, i, j, bottomData);
+                // For whatever reason, we store the top to bottom and vice versa when loading.
+                sphereCoords->SetPointDirect(TopHemiSurf, i, j, bottomData);
             }
         }
     }
@@ -102,8 +104,8 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
 
             //std::cout << len_squared << "," << z_coord << std::endl;
 
-            uint32_t pixelDataTop = coords->GetClosestPixel(x_coord, y_coord, z_coord);
-            uint32_t pixelDataBottom = coords->GetClosestPixel(x_coord, y_coord, -z_coord);
+            uint32_t pixelDataTop = coords->GetClosestPixel(x_coord, y_coord, -z_coord);
+            uint32_t pixelDataBottom = coords->GetClosestPixel(x_coord, y_coord, z_coord);
 
             // Set pixel in the final UV image
             skydomeImages[0].SetPixel(i, j, pixelDataTop);

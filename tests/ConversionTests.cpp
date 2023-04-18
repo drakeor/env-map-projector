@@ -113,8 +113,8 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
     SECTION( "skydome to equirectangular" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
-        auto bottomImg = reader.LoadImage("assets/testimages/skydome_gradient.png");
+        auto topImg = reader.LoadImage("assets/testimages/skydome.png");
+        auto bottomImg = reader.LoadImage("assets/testimages/skydome.png");
 
         HemisphericalProjection<double> sourceProj;
         std::shared_ptr<CoordContainerBase<double>> coords = 
@@ -126,5 +126,23 @@ TEST_CASE( "ConversionTests", "[conversion]" ) {
 
         ImageWriter writer;
         writer.SaveImage("assets/testoutput/skydome_to_equirect.png", newImg);
+    }
+
+    SECTION( "equirectangular to skydome" ) {
+
+        ImageReader reader;
+        auto testImg = reader.LoadImage("assets/testimages/equirectangular_image.jpg");
+
+        EquirectangularProjection<double> sourceProj;
+        std::shared_ptr<CoordContainerBase<double>> coords = 
+            sourceProj.LoadImageToSphericalCoords(&testImg);
+
+        HemisphericalProjection<double> destProj;
+        std::array<EnvMapImage, 2> newImgs = 
+            destProj.ConvertToImages(coords.get(), 512);
+
+        ImageWriter writer;
+        writer.SaveImage("assets/testoutput/equirectangular_to_skydome_top.png", newImgs[0]);
+        writer.SaveImage("assets/testoutput/equirectangular_to_skydome_bottom.png", newImgs[1]);
     }
 }
