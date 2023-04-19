@@ -1,5 +1,6 @@
 #include "CoordContainerHemiSpherical.h"
 #include "CoordConversions.h"
+#include "Point3d.h"
 
 #include <iostream>
 
@@ -133,8 +134,8 @@ uint32_t CoordContainerHemiSpherical<T>::GetClosestPixel(T azim, T elev)
     pointSphere.azimuth = azim;
     pointSphere.elevation = elev;
     
-    Eigen::Vector3<T> pointCart = CoordConversions<T>::SphericalToCartesian(pointSphere);
-    return GetClosestPixel(pointCart.x(), pointCart.y(), pointCart.z());
+    Point3d<T> pointCart = CoordConversions<T>::SphericalToCartesian(pointSphere);
+    return GetClosestPixel(pointCart.x, pointCart.y, pointCart.z);
 }
 
 template<typename T>

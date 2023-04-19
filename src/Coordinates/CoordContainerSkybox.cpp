@@ -1,5 +1,6 @@
 #include "CoordContainerSkybox.h"
 #include "CoordConversions.h"
+#include "Point3d.h"
 
 #include <iostream>
 #include <cmath>
@@ -82,7 +83,8 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
     // Define some epsilon value for floating point comparisons
     T epsilon = 10e-9f;
     
-    Eigen::Vector3<T> cartCoord(x, y, z);
+    std::array<T, 3> cartCoord = {x, y, z};
+    //Eigen::Vector3<T> cartCoord(x, y, z);
     uint32_t sideIndex = 0;
     T u = 0;
     T v = 0;
@@ -90,16 +92,30 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
     // Convert cartesian point to a side
     for(uint32_t i = 0; i < 6; i++)
     {
-        Eigen::Vector3i coordMap = CoordConversions<T>::SideToCoordMapInv(
+        Point3d<int32_t> coordMap = CoordConversions<T>::SideToCoordMapInv(
             static_cast<SkyboxSurf>(i));
         T constVal = CoordConversions<T>::SideToConstVal(
             static_cast<SkyboxSurf>(i));
         
-        Eigen::Vector3<T> tmpUvCoord(0, 0, 0);
-        
-        tmpUvCoord(0) = cartCoord(coordMap[0]);
-        tmpUvCoord(1) = cartCoord(coordMap[1]);
-        tmpUvCoord(2) = cartCoord(coordMap[2]);
+        std::array<T, 3> tmpUvCoord = {0, 0, 0};
+        //Eigen::Vector3<T> tmpUvCoord(0, 0, 0);
+
+        tmpUvCoord[0] = cartCoord[coordMap.x];
+        tmpUvCoord[1] = cartCoord[coordMap.y];
+        tmpUvCoord[2] = cartCoord[coordMap.z];
+
+        if(fabs(tmpUvCoord[2] - constVal) < epsilon)
+        {
+            sideIndex = i;
+            u = tmpUvCoord[0];
+            v = tmpUvCoord[1];
+            break;
+        }
+
+        /*
+        tmpUvCoord(0) = cartCoord(coordMap.x);
+        tmpUvCoord(1) = cartCoord(coordMap.y);
+        tmpUvCoord(2) = cartCoord(coordMap.z);
 
         if(fabs(tmpUvCoord(2) - constVal) < epsilon)
         {
@@ -107,7 +123,8 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
             u = tmpUvCoord(0);
             v = tmpUvCoord(1);
             break;
-        }
+        }*/
+
     }
 
     // Convert domain of u,v from [-1,1] to [0,sideIndex]
@@ -220,8 +237,8 @@ template<typename T>
 uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
 {
     // Convert to cartesian and pass to above function
-    Eigen::Vector3<T> point = CoordConversions<T>::SphericalToCartesian({azim, evel});
-    return GetClosestPixel(point.x(), point.y(), point.z());
+    Point3d<T> point = CoordConversions<T>::SphericalToCartesian({azim, evel});
+    return GetClosestPixel(point.x, point.y, point.z);
 }
 
 

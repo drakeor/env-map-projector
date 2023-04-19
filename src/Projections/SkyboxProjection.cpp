@@ -114,10 +114,9 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
     // Output all six images
     for(int k = 0; k < skyboxImgs.size(); k++)
     {
-        Eigen::Vector3i coordMap = CoordConversions<T>::SideToCoordMap(static_cast<SkyboxSurf>(k));
+        Point3d<int32_t> coordMap = CoordConversions<T>::SideToCoordMap(static_cast<SkyboxSurf>(k));
         T constVal = CoordConversions<T>::SideToConstVal(static_cast<SkyboxSurf>(k));
 
-        // We only need to build this matrix once
         for(int i = 0; i < skyboxImgs[k].GetWidth(); i++)
         {
             for(int j = 0; j < skyboxImgs[k].GetHeight(); j++)
@@ -131,17 +130,28 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
                 v = 2.0f * v - 1.0f;
 
                 // Convert from domain [0,1] to [-1,1] on u and v and add in the constant value
-                Eigen::Vector3f uvCoord(u, v, constVal);
+                std::array<T, 3> uvCoord = {u, v, constVal};
+                //Eigen::Vector3f uvCoord(u, v, constVal);
 
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,c] -> [x,y,z]
-                Eigen::Vector3f cartCoord;
-                cartCoord(0) = uvCoord(coordMap[0]);
-                cartCoord(1) = uvCoord(coordMap[1]);
-                cartCoord(2) = uvCoord(coordMap[2]);
+                //Eigen::Vector3f cartCoord;
+                //std::array<T, 3> cartCoord = {0, 0, 0};
+                Point3d<T> cartCoord;
+
+                cartCoord.x = uvCoord[coordMap.x];
+                cartCoord.y = uvCoord[coordMap.y];
+                cartCoord.z = uvCoord[coordMap.z];
+
+                uint32_t pixelData = coords->GetClosestPixel(cartCoord.x, cartCoord.y, cartCoord.z);
+
+                /*cartCoord(0) = uvCoord(coordMap.x);
+                cartCoord(1) = uvCoord(coordMap.y);
+                cartCoord(2) = uvCoord(coordMap.z);
                 
                 uint32_t pixelData = coords->GetClosestPixel(cartCoord.x(), cartCoord.y(), cartCoord.z());
-                
+                */
+
                 // Lastly, convert to spherical coordinates and store.
                 skyboxImgs[k].SetPixel(i, j, pixelData);
             }

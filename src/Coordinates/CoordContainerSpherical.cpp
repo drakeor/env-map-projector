@@ -105,8 +105,7 @@ template<typename T>
 uint32_t CoordContainerSpherical<T>::GetClosestPixel(T x, T y, T z)
 {
     // Convert point to spherical and pass to above function
-    Eigen::Vector3<T> pointCart(x, y, z);
-    PointSphere<T> pointSphere = CoordConversions<T>::CartesianToSpherical(pointCart);
+    PointSphere<T> pointSphere = CoordConversions<T>::CartesianToSpherical({x, y, z});
     return GetClosestPixel(pointSphere.azimuth, pointSphere.elevation);
 }
 

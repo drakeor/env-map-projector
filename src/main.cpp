@@ -1,82 +1,39 @@
 #include "Projections/SkyboxProjection.h"
 #include "Projections/EquirectangularProjection.h"
+#include "Projections/HemisphericalProjection.h"
 #include "Utils/ImageReader.h"
 #include "Utils/ImageWriter.h"
 
 using namespace EnvProj;
 
+
+
 int main()
 {
-    
-    SkyboxProjection<double> skyboxProj;
     ImageReader reader;
+    //auto srcImg = reader.LoadImage("assets/testimages/8k_moon.jpg");
+    auto srcImg = reader.LoadImage("assets/testimages/equirectangular_image.jpg");
 
-    auto topImg = reader.LoadImage("assets/skybox_big/top.jpg");
-    auto bottomImg = reader.LoadImage("assets/skybox_big/bottom.jpg");
-    auto leftImg = reader.LoadImage("assets/skybox_big/left.jpg");
-    auto rightImg = reader.LoadImage("assets/skybox_big/right.jpg");
-    auto frontImg = reader.LoadImage("assets/skybox_big/front.jpg");
-    auto backImg = reader.LoadImage("assets/skybox_big/back.jpg");
-
-    auto coords = skyboxProj.LoadImageToSphericalCoords(
-        &topImg, &bottomImg,
-        &leftImg, &rightImg, &frontImg, &backImg);
-
-
-    EquirectangularProjection<double> equiProj;
-    auto img = equiProj.ConvertToImage(coords.get(), 2048, 1024);
-
+    EquirectangularProjection<double> sourceProj;
+    auto coords = sourceProj.LoadImageToSphericalCoords(&srcImg);
     ImageWriter writer;
-    writer.SaveImage("converted_output.png", img);
-    
 
-/*
-    std::vector<Point3df> cartCoords;
-    for(int i = 0; i < sphericalPoints.size(); i++)
-    {
-        Point3df newPoint = proj.SphericalToCartesian(sphericalPoints[i]);
-        cartCoords.push_back(newPoint);
-    }
-    
-    std::cout << "x = [";
-    for(int i = 0; i < cartCoords.size(); i++)
-    {
-        std::cout << cartCoords[i].x << ",";
-    }
-    std:: cout << "]" << std::endl << std::endl;
 
-    std::cout << "y = [";
-    for(int i = 0; i < cartCoords.size(); i++)
-    {
-        std::cout << cartCoords[i].y << ",";
-    }
-    std:: cout << "]" << std::endl << std::endl;
-
-    std::cout << "z = [";
-    for(int i = 0; i < cartCoords.size(); i++)
-    {
-        std::cout << cartCoords[i].z << ",";
-    }
-    std:: cout << "]" << std::endl << std::endl;
-*/
-
+    SkyboxProjection<double> destProj;
+    std::array<EnvMapImage, 6> destImgs = destProj.ConvertToImages(coords.get(), 512);
     /*
-    std::cout << "azim = [";
-    for(int i = 0; i < sphericalPoints.size(); i++)
-    {
-        std::cout << sphericalPoints[i].azimuth << ",";
-    }
-    std:: cout << "]" << std::endl << std::endl;
-
-    std::cout << "evel = [";
-    for(int i = 0; i < sphericalPoints.size(); i++)
-    {
-        std::cout << sphericalPoints[i].elevation << ",";
-    }
-    std:: cout << "]" << std::endl << std::endl;
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_top.png", destImgs[0]);
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_bottom.png", destImgs[1]);
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_left.png", destImgs[2]);
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_right.png", destImgs[3]);
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_front.png", destImgs[4]);
+    writer.SaveImage("assets/testoutput/huge_converted_skybox_back.png", destImgs[5]);
     */
-
-
+    HemisphericalProjection<double> destProj2;
+    std::array<EnvMapImage, 2> destImgs2 = destProj2.ConvertToImages(coords.get(), 1024);
     
+    writer.SaveImage("assets/testoutput/huge_converted_hemi_top.png", destImgs2[0]);
+    writer.SaveImage("assets/testoutput/huge_converted_hemi_bottom.png", destImgs2[1]);
+
     return 0;
 }

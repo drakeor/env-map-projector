@@ -12,6 +12,7 @@ There are a few tools available already to do this task. However, some are locke
 This Program currently supports:
 * Equirectangular Projections
 * Skybox Projections
+* Hemispherical (Skydome) Projections
 
 ## Usage
 
@@ -31,7 +32,9 @@ CubeMap to Equirectangular Projection (Coming soon)
 
 * (Timothy Oldfield)[https://unsplash.com/@oldfieldart] for the Equirectangular texture.
 
-*(Tutorials for Blender3d)[https://tutorialsforblender3d.com/] for the skysphere texture.
+* (Tutorials for Blender3d)[https://tutorialsforblender3d.com/] for the skysphere texture.
+
+* (Solar System Scope)[https://www.solarsystemscope.com/textures/] for 8k texture tests.
 
 ## Libraries used:
 
