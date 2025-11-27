@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../lib/stb/stb_image.h"
+#include <stb_image.h>
 #include <iostream>
 
 #include "ImageReader.h"

@@ -6,7 +6,7 @@
 #include <memory>
 #include <array>
 
-#include "../../lib/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 
 #include "../Coordinates/CoordContainerBase.h"
 #include "../Utils/EnvMapImage.h"

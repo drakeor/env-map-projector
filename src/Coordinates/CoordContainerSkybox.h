@@ -1,7 +1,7 @@
 #ifndef _COORD_CONTAINER_CARTESIAN_H_
 #define _COORD_CONTAINER_CARTESIAN_H_
 
-#include "../../lib/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 #include "CoordContainerBase.h"
 #include "SkyboxSurf.h"
 

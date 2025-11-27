@@ -42,6 +42,18 @@ add_executable (envmapproj_tests
     ${SourceFiles}
 )
 
+target_include_directories(envmapproj PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/lib/eigen
+    ${PROJECT_SOURCE_DIR}/lib/stb
+)
+
+target_include_directories(envmapproj_tests PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/lib/eigen
+    ${PROJECT_SOURCE_DIR}/lib/stb
+)
+
 target_link_libraries(envmapproj_tests PRIVATE Catch2::Catch2WithMain)
 
 file(COPY assets DESTINATION bin)

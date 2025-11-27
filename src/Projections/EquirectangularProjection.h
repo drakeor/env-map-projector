@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-#include "../../lib/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 
 #include "../Coordinates/CoordContainerBase.h"
 #include "../Utils/EnvMapImage.h"

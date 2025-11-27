@@ -6,7 +6,7 @@
 #include "SkyboxSurf.h"
 #include "PointSphere.h"
 #include "Point3d.h"
-#include "../../lib/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 
 namespace EnvProj
 {

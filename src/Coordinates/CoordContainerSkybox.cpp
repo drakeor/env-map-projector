@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <cmath>
-#include "../../lib/eigen/Eigen/Dense"
+#include <Eigen/Dense>
 
 using namespace std;
 using namespace EnvProj;
