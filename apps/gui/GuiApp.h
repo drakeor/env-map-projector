@@ -23,8 +23,10 @@ public:
 private:
     void BeginFrame();
     void RenderFrame();
+    void ApplyUiScale();
 
     GLFWwindow* window;
+    float currentStyleScale;
     GuiState state;
     InputPanel inputPanel;
     OutputPanel outputPanel;

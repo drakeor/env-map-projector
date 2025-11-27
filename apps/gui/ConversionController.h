@@ -1,6 +1,10 @@
 #ifndef CONVERSION_CONTROLLER_H
 #define CONVERSION_CONTROLLER_H
 
+#include <atomic>
+#include <memory>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 #include "GuiState.h"
@@ -9,13 +13,48 @@
 class ConversionController
 {
 public:
-    ConversionController() = default;
+    ConversionController();
+    ~ConversionController();
 
-    void Convert(GuiState& state, const std::vector<ImageSlot>& slots);
+    void Update(GuiState& state);
+    bool StartConversion(GuiState& state, const std::vector<ImageSlot>& slots);
 
 private:
-    std::vector<EnvMapImage> PrepareImages(const std::vector<ImageSlot>& slots, AutoScaleMode mode);
+    struct SlotPayload
+    {
+        std::string label;
+        EnvMapImage image;
+    };
+
+    struct ConversionParams
+    {
+        ProjectionType inputProjection;
+        ProjectionType outputProjection;
+        AutoScaleMode autoScaleMode;
+        int outputWidth;
+        int outputHeight;
+        int cubeSide;
+    };
+
+    struct PendingResult
+    {
+        bool success = false;
+        std::vector<EnvMapImage> images;
+        std::vector<std::string> labels;
+        std::string message;
+    };
+
+    void WorkerThread(ConversionParams params, std::vector<SlotPayload> inputs);
+    std::vector<EnvMapImage> PrepareImages(std::vector<EnvMapImage> images, AutoScaleMode mode);
     EnvMapImage ResampleImage(const EnvMapImage& image, int targetWidth, int targetHeight);
+
+    void JoinWorker();
+
+    std::atomic<bool> running;
+    std::atomic<float> progress;
+    std::thread worker;
+    std::mutex resultMutex;
+    std::unique_ptr<PendingResult> pendingResult;
 };
 
 #endif

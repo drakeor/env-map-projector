@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "FileDialog.h"
+
 InputPanel::InputPanel()
     : currentProjection(ProjectionType::Equirectangular)
 {
@@ -21,6 +23,17 @@ void InputPanel::Draw(GuiState& state)
         {
             ImGui::PushID(static_cast<int>(i));
             ImGui::InputText("Path", slot.GetPathBuffer(), ImageSlot::PathBufferSize);
+            ImGui::SameLine();
+            if(ImGui::Button("Browse"))
+            {
+                std::string selected = FileDialog::OpenImageFile(slot.GetPathString());
+                if(!selected.empty())
+                {
+                    slot.SetPath(selected);
+                    slot.LoadFromDisk();
+                }
+            }
+
             if(ImGui::Button("Load"))
             {
                 slot.LoadFromDisk();

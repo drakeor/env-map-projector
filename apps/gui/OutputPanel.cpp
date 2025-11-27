@@ -1,11 +1,13 @@
 #include "OutputPanel.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <filesystem>
 #include <string>
 
 #include <GLFW/glfw3.h>
 
+#include "FileDialog.h"
 #include "Utils/ImageWriter.h"
 
 OutputPanel::OutputPanel()
@@ -45,6 +47,11 @@ void OutputPanel::DrawAutoScaleSelector(GuiState& state)
 
 void OutputPanel::DrawOutputSettings(GuiState& state)
 {
+    if(ImGui::SliderFloat("UI scale", &state.uiScale, 0.5f, 3.0f, "%.1fx"))
+    {
+        state.uiScale = std::clamp(state.uiScale, 0.5f, 3.0f);
+    }
+
     if(state.outputProjection == ProjectionType::Equirectangular)
     {
         ImGui::InputInt("Output width", &state.outputEquirectWidth);
@@ -59,6 +66,15 @@ void OutputPanel::DrawOutputSettings(GuiState& state)
     }
 
     ImGui::InputText("Output directory", state.outputDirectory.data(), state.outputDirectory.size());
+    ImGui::SameLine();
+    if(ImGui::Button("Browse##outputDir"))
+    {
+        std::string selected = FileDialog::SelectDirectory(state.outputDirectory.data());
+        if(!selected.empty())
+        {
+            std::snprintf(state.outputDirectory.data(), state.outputDirectory.size(), "%s", selected.c_str());
+        }
+    }
     ImGui::InputText("Filename prefix", state.outputPrefix.data(), state.outputPrefix.size());
 }
 
@@ -72,9 +88,7 @@ void OutputPanel::DrawConversionControls(GuiState& state, InputPanel& inputPanel
         }
         else if(!state.conversionInProgress)
         {
-            state.conversionInProgress = true;
-            controller.Convert(state, inputPanel.GetSlots());
-            state.conversionInProgress = false;
+            controller.StartConversion(state, inputPanel.GetSlots());
         }
     }
     ImGui::SameLine();
@@ -82,6 +96,8 @@ void OutputPanel::DrawConversionControls(GuiState& state, InputPanel& inputPanel
     {
         SaveOutputs(state);
     }
+
+    ImGui::ProgressBar(state.conversionProgress, ImVec2(-1.0f, 0.0f));
 
     if(!state.statusText.empty())
     {

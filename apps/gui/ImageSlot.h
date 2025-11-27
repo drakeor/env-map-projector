@@ -12,12 +12,14 @@
 class ImageSlot
 {
 public:
-    static constexpr size_t PathBufferSize = 512;
+    static constexpr size_t PathBufferSize = 1024;
 
     explicit ImageSlot(const std::string& label);
     ~ImageSlot();
 
     const std::string& GetLabel() const;
+    void SetPath(const std::string& path);
+    std::string GetPathString() const;
     char* GetPathBuffer();
     const char* GetPathBuffer() const;
 

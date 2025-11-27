@@ -1,5 +1,7 @@
 #include "GuiApp.h"
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "imgui.h"
@@ -15,7 +17,7 @@ void glfw_error_callback(int error, const char* description)
 }
 
 GuiApp::GuiApp()
-    : window(nullptr)
+    : window(nullptr), currentStyleScale(1.0f)
 {
 }
 
@@ -60,6 +62,7 @@ bool GuiApp::Initialize()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
+    currentStyleScale = 1.0f;
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
@@ -75,18 +78,28 @@ void GuiApp::Run()
     while(!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
+        conversionController.Update(state);
         BeginFrame();
+        ApplyUiScale();
 
-        if(ImGui::Begin("Input"))
-        {
-            inputPanel.Draw(state);
-        }
-        ImGui::End();
+        const ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->WorkPos);
+        ImGui::SetNextWindowSize(viewport->WorkSize);
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-        if(ImGui::Begin("Output"))
-        {
-            outputPanel.Draw(state, inputPanel, conversionController);
-        }
+        ImGui::Begin("EnvMapProjector", nullptr, windowFlags);
+        ImVec2 content = ImGui::GetContentRegionAvail();
+        float leftWidth = std::max(320.0f, content.x * 0.4f);
+
+        ImGui::BeginChild("InputPanel", ImVec2(leftWidth, 0), true);
+        inputPanel.Draw(state);
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+        ImGui::BeginChild("OutputPanel", ImVec2(0, 0), true);
+        outputPanel.Draw(state, inputPanel, conversionController);
+        ImGui::EndChild();
         ImGui::End();
 
         RenderFrame();
@@ -125,4 +138,17 @@ void GuiApp::RenderFrame()
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(window);
+}
+
+void GuiApp::ApplyUiScale()
+{
+    float clampedScale = std::clamp(state.uiScale, 0.5f, 3.0f);
+    ImGui::GetIO().FontGlobalScale = clampedScale;
+
+    if(std::abs(clampedScale - currentStyleScale) > 0.01f)
+    {
+        float ratio = clampedScale / currentStyleScale;
+        ImGui::GetStyle().ScaleAllSizes(ratio);
+        currentStyleScale = clampedScale;
+    }
 }

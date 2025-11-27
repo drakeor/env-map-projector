@@ -1,5 +1,6 @@
 #include "ImageSlot.h"
 
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 
@@ -19,6 +20,16 @@ ImageSlot::~ImageSlot()
 const std::string& ImageSlot::GetLabel() const
 {
     return label;
+}
+
+void ImageSlot::SetPath(const std::string& path)
+{
+    std::snprintf(pathBuffer.data(), pathBuffer.size(), "%s", path.c_str());
+}
+
+std::string ImageSlot::GetPathString() const
+{
+    return std::string(pathBuffer.data());
 }
 
 char* ImageSlot::GetPathBuffer()

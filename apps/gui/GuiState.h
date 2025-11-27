@@ -28,14 +28,17 @@ struct GuiState
     ProjectionType outputProjection = ProjectionType::Skybox;
     AutoScaleMode autoScaleMode = AutoScaleMode::None;
 
+    float uiScale = 2.0f;
+
     int outputEquirectWidth = 2048;
     int outputEquirectHeight = 1024;
     int outputCubeSide = 1024;
 
-    std::array<char, 512> outputDirectory = {"assets/testoutput"};
-    std::array<char, 128> outputPrefix = {"converted"};
+    std::array<char, 1024> outputDirectory = {"assets/testoutput"};
+    std::array<char, 256> outputPrefix = {"converted"};
 
     bool conversionInProgress = false;
+    float conversionProgress = 0.0f;
     std::string statusText;
 
     std::vector<EnvMapImage> convertedImages;

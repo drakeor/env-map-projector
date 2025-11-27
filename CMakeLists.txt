@@ -96,6 +96,7 @@ add_executable(envmapproj_gui
     apps/gui/OutputPanel.cpp
     apps/gui/ImageSlot.cpp
     apps/gui/ConversionController.cpp
+    apps/gui/FileDialog.cpp
     ${IMGUI_SOURCES}
 )
 target_include_directories(envmapproj_gui PRIVATE
