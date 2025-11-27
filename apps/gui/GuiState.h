@@ -26,13 +26,17 @@ struct GuiState
 {
     ProjectionType inputProjection = ProjectionType::Equirectangular;
     ProjectionType outputProjection = ProjectionType::Skybox;
-    AutoScaleMode autoScaleMode = AutoScaleMode::None;
+    AutoScaleMode autoScaleMode = AutoScaleMode::ScaleToLargest;
+    float outputScale = 1.0f;
+    bool hemisphereArtifactReduction = true;
 
+    int uiScaleIndex = 1;
     float uiScale = 2.0f;
 
-    int outputEquirectWidth = 2048;
-    int outputEquirectHeight = 1024;
-    int outputCubeSide = 1024;
+    int outputEquirectWidth = 0;
+    int outputEquirectHeight = 0;
+    int outputSkyboxSize = 0;
+    int outputHemisphericalSize = 0;
 
     std::array<char, 1024> outputDirectory = {"assets/testoutput"};
     std::array<char, 256> outputPrefix = {"converted"};

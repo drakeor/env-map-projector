@@ -142,7 +142,7 @@ void GuiApp::RenderFrame()
 
 void GuiApp::ApplyUiScale()
 {
-    float clampedScale = std::clamp(state.uiScale, 0.5f, 3.0f);
+    float clampedScale = std::clamp(state.uiScale, 1.0f, 4.0f);
     ImGui::GetIO().FontGlobalScale = clampedScale;
 
     if(std::abs(clampedScale - currentStyleScale) > 0.01f)

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <memory>
 #include <sstream>
 
@@ -25,17 +26,15 @@ std::string EscapePath(const std::string& path)
 std::string FileDialog::OpenImageFile(const std::string& defaultPath)
 {
     std::string command;
+    std::string basePath = defaultPath.empty() ? std::filesystem::current_path().string() : defaultPath;
     if(CommandExists("zenity"))
     {
         command = "zenity --file-selection --title=\"Select image\" --file-filter=\"Images | *.png *.jpg *.jpeg *.hdr *.exr *.tga\"";
-        if(!defaultPath.empty())
-        {
-            command += " --filename=\"" + EscapePath(defaultPath) + "/\"";
-        }
+        command += " --filename=\"" + EscapePath(basePath) + "/\"";
     }
     else if(CommandExists("kdialog"))
     {
-        command = "kdialog --getopenfilename " + EscapePath(defaultPath.empty() ? std::string(".") : defaultPath) + " \"*.png *.jpg *.jpeg *.hdr *.exr *.tga\"";
+        command = "kdialog --getopenfilename \"" + EscapePath(basePath) + "\" \"*.png *.jpg *.jpeg *.hdr *.exr *.tga\"";
     }
     else
     {
@@ -48,17 +47,15 @@ std::string FileDialog::OpenImageFile(const std::string& defaultPath)
 std::string FileDialog::SelectDirectory(const std::string& defaultPath)
 {
     std::string command;
+    std::string basePath = defaultPath.empty() ? std::filesystem::current_path().string() : defaultPath;
     if(CommandExists("zenity"))
     {
         command = "zenity --file-selection --directory --title=\"Select directory\"";
-        if(!defaultPath.empty())
-        {
-            command += " --filename=\"" + EscapePath(defaultPath) + "/\"";
-        }
+        command += " --filename=\"" + EscapePath(basePath) + "/\"";
     }
     else if(CommandExists("kdialog"))
     {
-        command = "kdialog --getexistingdirectory " + EscapePath(defaultPath.empty() ? std::string(".") : defaultPath);
+        command = "kdialog --getexistingdirectory \"" + EscapePath(basePath) + "\"";
     }
     else
     {

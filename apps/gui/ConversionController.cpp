@@ -2,12 +2,15 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "Projections/EquirectangularProjection.h"
 #include "Projections/SkyboxProjection.h"
 #include "Projections/HemisphericalProjection.h"
+#include "Utils/ProjectionSizing.h"
 
 namespace
 {
@@ -19,6 +22,60 @@ std::vector<std::string> SkyboxLabels()
 std::vector<std::string> HemisphereLabels()
 {
     return {"top", "bottom"};
+}
+
+int ExtractSkyboxFaceSize(const std::vector<EnvMapImage>& images)
+{
+    int face = 0;
+    for(const auto& image : images)
+    {
+        int candidate = std::min(image.GetWidth(), image.GetHeight());
+        if(candidate <= 0)
+            continue;
+        if(face == 0)
+            face = candidate;
+        else
+            face = std::min(face, candidate);
+    }
+    if(face == 0)
+        face = 1024;
+    return std::max(face, 16);
+}
+
+int ExtractHemisphereSquareSize(const std::vector<EnvMapImage>& images)
+{
+    int square = 0;
+    for(const auto& image : images)
+    {
+        int candidate = std::min(image.GetWidth(), image.GetHeight());
+        if(candidate <= 0)
+            continue;
+        if(square == 0)
+            square = candidate;
+        else
+            square = std::min(square, candidate);
+    }
+    if(square == 0)
+        square = 2048;
+    return std::max(square, 16);
+}
+
+ProjectionSizing::SizeSet BuildSizeSet(ProjectionType projection, const std::vector<EnvMapImage>& images,
+    ProjectionSizing::HemisphereSizingMode hemiMode)
+{
+    using namespace ProjectionSizing;
+    switch(projection)
+    {
+        case ProjectionType::Equirectangular:
+            if(!images.empty())
+                return FromEquirectangular(images[0].GetWidth(), images[0].GetHeight(), hemiMode);
+            return FromEquirectangular(2048, 1024, hemiMode);
+        case ProjectionType::Skybox:
+            return FromCubemapFace(ExtractSkyboxFaceSize(images), hemiMode);
+        case ProjectionType::Hemispherical:
+            return FromHemispherical(ExtractHemisphereSquareSize(images), hemiMode);
+    }
+    return FromEquirectangular(2048, 1024, hemiMode);
 }
 }
 
@@ -54,6 +111,19 @@ void ConversionController::Update(GuiState& state)
             state.convertedLabels = std::move(result->labels);
             state.convertedGeneration++;
             state.conversionProgress = 1.0f;
+            switch(result->outputProjection)
+            {
+                case ProjectionType::Equirectangular:
+                    state.outputEquirectWidth = result->outputWidth;
+                    state.outputEquirectHeight = result->outputHeight;
+                    break;
+                case ProjectionType::Skybox:
+                    state.outputSkyboxSize = result->outputWidth;
+                    break;
+                case ProjectionType::Hemispherical:
+                    state.outputHemisphericalSize = result->outputWidth;
+                    break;
+            }
         }
         state.statusText = result->message;
     }
@@ -90,9 +160,11 @@ bool ConversionController::StartConversion(GuiState& state, const std::vector<Im
     params.inputProjection = state.inputProjection;
     params.outputProjection = state.outputProjection;
     params.autoScaleMode = state.autoScaleMode;
-    params.outputWidth = state.outputEquirectWidth;
-    params.outputHeight = state.outputEquirectHeight;
-    params.cubeSide = state.outputCubeSide;
+    params.hemisphereMode = state.hemisphereArtifactReduction ?
+        ProjectionSizing::HemisphereSizingMode::ArtifactReduction : ProjectionSizing::HemisphereSizingMode::Identity;
+    params.outputScale = state.outputScale;
+    params.outputWidth = 0;
+    params.outputHeight = 0;
 
     JoinWorker();
     {
@@ -105,6 +177,19 @@ bool ConversionController::StartConversion(GuiState& state, const std::vector<Im
     state.conversionInProgress = true;
     state.conversionProgress = 0.0f;
     state.statusText = "Converting...";
+    switch(state.outputProjection)
+    {
+        case ProjectionType::Equirectangular:
+            state.outputEquirectWidth = 0;
+            state.outputEquirectHeight = 0;
+            break;
+        case ProjectionType::Skybox:
+            state.outputSkyboxSize = 0;
+            break;
+        case ProjectionType::Hemispherical:
+            state.outputHemisphericalSize = 0;
+            break;
+    }
 
     worker = std::thread(&ConversionController::WorkerThread, this, params, std::move(payloads));
     return true;
@@ -113,6 +198,7 @@ bool ConversionController::StartConversion(GuiState& state, const std::vector<Im
 void ConversionController::WorkerThread(ConversionParams params, std::vector<SlotPayload> inputs)
 {
     std::unique_ptr<PendingResult> result = std::make_unique<PendingResult>();
+    result->outputProjection = params.outputProjection;
 
     std::vector<EnvMapImage> images;
     images.reserve(inputs.size());
@@ -135,6 +221,17 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
         running = false;
         return;
     }
+
+    int computedWidth = 0;
+    int computedHeight = 0;
+    float scaleFactor = std::clamp(params.outputScale, 0.5f, 4.0f);
+    auto scaleDimension = [scaleFactor](int value) {
+        int base = (value <= 0) ? 16 : value;
+        int scaled = static_cast<int>(std::round(static_cast<float>(base) * scaleFactor));
+        return std::max(scaled, 16);
+    };
+
+    ProjectionSizing::SizeSet sizeSet = BuildSizeSet(params.inputProjection, images, params.hemisphereMode);
 
     std::shared_ptr<EnvProj::CoordContainerBase<double>> coords;
     switch(params.inputProjection)
@@ -173,6 +270,22 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
         return;
     }
 
+    if(params.outputProjection == ProjectionType::Equirectangular)
+    {
+        computedWidth = scaleDimension(sizeSet.equirectWidth);
+        computedHeight = scaleDimension(sizeSet.equirectHeight);
+    }
+    else if(params.outputProjection == ProjectionType::Skybox)
+    {
+        int face = scaleDimension(sizeSet.cubemapFace);
+        computedWidth = computedHeight = face;
+    }
+    else
+    {
+        int hemi = scaleDimension(sizeSet.hemisphereSize);
+        computedWidth = computedHeight = hemi;
+    }
+
     progress = 0.55f;
     std::vector<EnvMapImage> outputs;
     std::vector<std::string> labels;
@@ -182,14 +295,14 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
         case ProjectionType::Equirectangular:
         {
             EnvProj::EquirectangularProjection<double> proj;
-            outputs.push_back(proj.ConvertToImage(coords.get(), params.outputWidth, params.outputHeight));
+            outputs.push_back(proj.ConvertToImage(coords.get(), computedWidth, computedHeight));
             labels.push_back("equirect");
             break;
         }
         case ProjectionType::Skybox:
         {
             EnvProj::SkyboxProjection<double> proj;
-            auto imgs = proj.ConvertToImages(coords.get(), static_cast<uint32_t>(params.cubeSide));
+            auto imgs = proj.ConvertToImages(coords.get(), static_cast<uint32_t>(computedWidth));
             auto lbls = SkyboxLabels();
             for(size_t i = 0; i < imgs.size(); ++i)
             {
@@ -201,7 +314,7 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
         case ProjectionType::Hemispherical:
         {
             EnvProj::HemisphericalProjection<double> proj;
-            auto imgs = proj.ConvertToImages(coords.get(), static_cast<uint32_t>(params.cubeSide));
+            auto imgs = proj.ConvertToImages(coords.get(), static_cast<uint32_t>(computedWidth));
             auto lbls = HemisphereLabels();
             for(size_t i = 0; i < imgs.size(); ++i)
             {
@@ -216,6 +329,8 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
     result->images = std::move(outputs);
     result->labels = std::move(labels);
     result->message = "Conversion complete";
+    result->outputWidth = computedWidth;
+    result->outputHeight = computedHeight;
     progress = 1.0f;
 
     {

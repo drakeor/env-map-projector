@@ -21,9 +21,13 @@ public:
 private:
     void RebuildSlots(ProjectionType type);
     void DrawProjectionSelector(GuiState& state);
+    void DrawPreviewModal();
 
     ProjectionType currentProjection;
     std::vector<ImageSlot> slots;
+    bool previewOpen;
+    int previewSlotIndex;
+    bool openPreviewThisFrame;
 };
 
 #endif

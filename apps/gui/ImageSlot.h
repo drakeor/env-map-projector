@@ -33,10 +33,14 @@ public:
 
     GLuint GetTextureId() const;
 
+    bool Rotate90CW();
+    bool Rotate90CCW();
+    bool FlipHorizontal();
+    bool FlipVertical();
+
 private:
     void UploadTexture();
     void ReleaseTexture();
-
     std::string label;
     std::array<char, PathBufferSize> pathBuffer;
     std::shared_ptr<EnvMapImage> image;

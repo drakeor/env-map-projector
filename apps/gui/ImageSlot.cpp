@@ -99,6 +99,104 @@ GLuint ImageSlot::GetTextureId() const
     return textureId;
 }
 
+bool ImageSlot::Rotate90CW()
+{
+    if(!HasImage())
+        return false;
+
+    const int srcWidth = image->GetWidth();
+    const int srcHeight = image->GetHeight();
+    EnvMapImage rotated(srcHeight, srcWidth);
+
+    for(int y = 0; y < srcHeight; ++y)
+    {
+        for(int x = 0; x < srcWidth; ++x)
+        {
+            unsigned int pixel = image->GetPixel(x, y);
+            int newX = srcHeight - 1 - y;
+            int newY = x;
+            rotated.SetPixel(newX, newY, pixel);
+        }
+    }
+
+    *image = rotated;
+    UploadTexture();
+    return true;
+}
+
+bool ImageSlot::Rotate90CCW()
+{
+    if(!HasImage())
+        return false;
+
+    const int srcWidth = image->GetWidth();
+    const int srcHeight = image->GetHeight();
+    EnvMapImage rotated(srcHeight, srcWidth);
+
+    for(int y = 0; y < srcHeight; ++y)
+    {
+        for(int x = 0; x < srcWidth; ++x)
+        {
+            unsigned int pixel = image->GetPixel(x, y);
+            int newX = y;
+            int newY = srcWidth - 1 - x;
+            rotated.SetPixel(newX, newY, pixel);
+        }
+    }
+
+    *image = rotated;
+    UploadTexture();
+    return true;
+}
+
+bool ImageSlot::FlipHorizontal()
+{
+    if(!HasImage())
+        return false;
+
+    const int width = image->GetWidth();
+    const int height = image->GetHeight();
+    EnvMapImage flipped(width, height);
+
+    for(int y = 0; y < height; ++y)
+    {
+        for(int x = 0; x < width; ++x)
+        {
+            unsigned int pixel = image->GetPixel(x, y);
+            int newX = width - 1 - x;
+            flipped.SetPixel(newX, y, pixel);
+        }
+    }
+
+    *image = flipped;
+    UploadTexture();
+    return true;
+}
+
+bool ImageSlot::FlipVertical()
+{
+    if(!HasImage())
+        return false;
+
+    const int width = image->GetWidth();
+    const int height = image->GetHeight();
+    EnvMapImage flipped(width, height);
+
+    for(int y = 0; y < height; ++y)
+    {
+        for(int x = 0; x < width; ++x)
+        {
+            unsigned int pixel = image->GetPixel(x, y);
+            int newY = height - 1 - y;
+            flipped.SetPixel(x, newY, pixel);
+        }
+    }
+
+    *image = flipped;
+    UploadTexture();
+    return true;
+}
+
 void ImageSlot::UploadTexture()
 {
     if(!HasImage())

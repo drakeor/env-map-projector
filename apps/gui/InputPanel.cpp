@@ -1,11 +1,28 @@
 #include "InputPanel.h"
 
+#include <algorithm>
 #include <string>
 
 #include "FileDialog.h"
 
+namespace
+{
+ImVec2 FitImageSize(int width, int height, float maxEdge)
+{
+    if(width <= 0 || height <= 0)
+        return ImVec2(maxEdge, maxEdge);
+
+    float w = static_cast<float>(width);
+    float h = static_cast<float>(height);
+    float aspect = w / h;
+    if(aspect >= 1.0f)
+        return ImVec2(maxEdge, maxEdge / aspect);
+    return ImVec2(maxEdge * aspect, maxEdge);
+}
+}
+
 InputPanel::InputPanel()
-    : currentProjection(ProjectionType::Equirectangular)
+    : currentProjection(ProjectionType::Equirectangular), previewOpen(false), previewSlotIndex(-1), openPreviewThisFrame(false)
 {
     RebuildSlots(currentProjection);
 }
@@ -13,6 +30,8 @@ InputPanel::InputPanel()
 void InputPanel::Draw(GuiState& state)
 {
     DrawProjectionSelector(state);
+
+    openPreviewThisFrame = false;
 
     for(size_t i = 0; i < slots.size(); ++i)
     {
@@ -26,7 +45,8 @@ void InputPanel::Draw(GuiState& state)
             ImGui::SameLine();
             if(ImGui::Button("Browse"))
             {
-                std::string selected = FileDialog::OpenImageFile(slot.GetPathString());
+                std::string base = slot.GetPathString();
+                std::string selected = FileDialog::OpenImageFile(base);
                 if(!selected.empty())
                 {
                     slot.SetPath(selected);
@@ -46,11 +66,36 @@ void InputPanel::Draw(GuiState& state)
 
             if(slot.HasImage())
             {
+                const ImVec4 transformColor = ImVec4(0.20f, 0.32f, 0.58f, 1.0f);
+                const ImVec4 transformHover = ImVec4(0.27f, 0.41f, 0.69f, 1.0f);
+                const ImVec4 transformActive = ImVec4(0.16f, 0.29f, 0.52f, 1.0f);
+                ImGui::PushStyleColor(ImGuiCol_Button, transformColor);
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, transformHover);
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, transformActive);
+                if(ImGui::Button("Rotate CW"))
+                    slot.Rotate90CW();
+                ImGui::SameLine();
+                if(ImGui::Button("Rotate CCW"))
+                    slot.Rotate90CCW();
+                ImGui::SameLine();
+                if(ImGui::Button("Flip H"))
+                    slot.FlipHorizontal();
+                ImGui::SameLine();
+                if(ImGui::Button("Flip V"))
+                    slot.FlipVertical();
+                ImGui::PopStyleColor(3);
+
                 ImGui::Text("%dx%d", slot.GetWidth(), slot.GetHeight());
                 if(slot.GetTextureId() != 0)
                 {
-                    ImVec2 size(200.0f, 200.0f);
-                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), size);
+                    ImVec2 previewSize = FitImageSize(slot.GetWidth(), slot.GetHeight(), 220.0f);
+                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), previewSize);
+                    if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                    {
+                        previewSlotIndex = static_cast<int>(i);
+                        previewOpen = true;
+                        openPreviewThisFrame = true;
+                    }
                 }
             }
             else
@@ -60,6 +105,13 @@ void InputPanel::Draw(GuiState& state)
             ImGui::PopID();
         }
     }
+
+    if(openPreviewThisFrame)
+    {
+        ImGui::OpenPopup("ImagePreviewModal");
+    }
+
+    DrawPreviewModal();
 }
 
 bool InputPanel::HasAllImages() const
@@ -113,5 +165,61 @@ void InputPanel::RebuildSlots(ProjectionType type)
             slots.emplace_back("Top Hemisphere");
             slots.emplace_back("Bottom Hemisphere");
             break;
+    }
+}
+
+void InputPanel::DrawPreviewModal()
+{
+    if(!previewOpen)
+        return;
+
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 viewportSize = viewport ? viewport->Size : ImVec2(1280.0f, 720.0f);
+    ImVec2 modalSize(viewportSize.x * 0.75f, viewportSize.y * 0.75f);
+    ImGui::SetNextWindowSize(modalSize, ImGuiCond_Appearing);
+
+    bool modalOpen = true;
+    if(ImGui::BeginPopupModal("ImagePreviewModal", &modalOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if(previewSlotIndex < 0 || previewSlotIndex >= static_cast<int>(slots.size()) || !slots[previewSlotIndex].HasImage())
+        {
+            ImGui::TextUnformatted("No image available");
+        }
+        else
+        {
+            const ImageSlot& slot = slots[previewSlotIndex];
+            ImGui::TextUnformatted(slot.GetLabel().c_str());
+            if(slot.GetTextureId() != 0)
+            {
+                ImVec2 avail = ImGui::GetContentRegionAvail();
+                float maxEdge = std::min(avail.x, avail.y);
+                if(maxEdge <= 0.0f)
+                    maxEdge = std::min(modalSize.x, modalSize.y) - 40.0f;
+                float texW = static_cast<float>(slot.GetWidth());
+                float texH = static_cast<float>(slot.GetHeight());
+                float scale = 1.0f;
+                if(texW > maxEdge || texH > maxEdge)
+                {
+                    float scaleW = maxEdge / texW;
+                    float scaleH = maxEdge / texH;
+                    scale = std::min(scaleW, scaleH);
+                }
+                ImVec2 size(texW * scale, texH * scale);
+                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), size);
+            }
+        }
+
+        if(ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+            modalOpen = false;
+        }
+        ImGui::EndPopup();
+    }
+
+    if(!modalOpen)
+    {
+        previewOpen = false;
+        previewSlotIndex = -1;
     }
 }

@@ -23,12 +23,16 @@ private:
     void DrawConversionControls(GuiState& state, InputPanel& inputPanel, ConversionController& controller);
     void DrawOutputSettings(GuiState& state);
     void DrawConvertedOutputs(GuiState& state);
+    void DrawOutputPreviewModal(GuiState& state);
     void SaveOutputs(GuiState& state);
     void RebuildOutputTextures(GuiState& state);
     void ReleaseOutputTextures();
 
     std::vector<GLuint> outputTextures;
     uint64_t cachedGeneration;
+    bool outputPreviewOpen;
+    int outputPreviewIndex;
+    bool openOutputPreviewThisFrame;
 };
 
 #endif

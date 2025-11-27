@@ -4,11 +4,13 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
 #include <vector>
 
 #include "GuiState.h"
 #include "ImageSlot.h"
+#include "Utils/ProjectionSizing.h"
 
 class ConversionController
 {
@@ -31,9 +33,10 @@ private:
         ProjectionType inputProjection;
         ProjectionType outputProjection;
         AutoScaleMode autoScaleMode;
+        ProjectionSizing::HemisphereSizingMode hemisphereMode;
+        float outputScale;
         int outputWidth;
         int outputHeight;
-        int cubeSide;
     };
 
     struct PendingResult
@@ -42,6 +45,9 @@ private:
         std::vector<EnvMapImage> images;
         std::vector<std::string> labels;
         std::string message;
+        ProjectionType outputProjection = ProjectionType::Equirectangular;
+        int outputWidth = 0;
+        int outputHeight = 0;
     };
 
     void WorkerThread(ConversionParams params, std::vector<SlotPayload> inputs);

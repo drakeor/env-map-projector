@@ -10,8 +10,32 @@
 #include "FileDialog.h"
 #include "Utils/ImageWriter.h"
 
+namespace
+{
+ImVec2 FitImageSize(int width, int height, float maxEdge)
+{
+    if(width <= 0 || height <= 0)
+        return ImVec2(maxEdge, maxEdge);
+
+    float w = static_cast<float>(width);
+    float h = static_cast<float>(height);
+    float aspect = w / h;
+    if(aspect >= 1.0f)
+        return ImVec2(maxEdge, maxEdge / aspect);
+    return ImVec2(maxEdge * aspect, maxEdge);
+}
+
+void DrawSizeLabel(const char* label, int value)
+{
+    if(value > 0)
+        ImGui::Text("%s: %d px", label, value);
+    else
+        ImGui::Text("%s: auto", label);
+}
+}
+
 OutputPanel::OutputPanel()
-    : cachedGeneration(0)
+    : cachedGeneration(0), outputPreviewOpen(false), outputPreviewIndex(-1), openOutputPreviewThisFrame(false)
 {
 }
 
@@ -47,22 +71,36 @@ void OutputPanel::DrawAutoScaleSelector(GuiState& state)
 
 void OutputPanel::DrawOutputSettings(GuiState& state)
 {
-    if(ImGui::SliderFloat("UI scale", &state.uiScale, 0.5f, 3.0f, "%.1fx"))
+    static const char* scaleLabels[] = {"1.0x", "2.0x", "4.0x"};
+    static const float scaleValues[] = {1.0f, 2.0f, 4.0f};
+    state.uiScaleIndex = std::clamp(state.uiScaleIndex, 0, 2);
+    int scaleIndex = state.uiScaleIndex;
+    if(ImGui::Combo("UI scale", &scaleIndex, scaleLabels, IM_ARRAYSIZE(scaleLabels)))
     {
-        state.uiScale = std::clamp(state.uiScale, 0.5f, 3.0f);
+        state.uiScaleIndex = scaleIndex;
+    }
+    state.uiScale = scaleValues[state.uiScaleIndex];
+
+    if(ImGui::SliderFloat("Output scale", &state.outputScale, 0.5f, 4.0f, "%.1fx"))
+    {
+        state.outputScale = std::clamp(state.outputScale, 0.5f, 4.0f);
     }
 
+    ImGui::Checkbox("Hemispherical artifact reduction", &state.hemisphereArtifactReduction);
+
+    ImGui::SeparatorText("Output size");
     if(state.outputProjection == ProjectionType::Equirectangular)
     {
-        ImGui::InputInt("Output width", &state.outputEquirectWidth);
-        ImGui::InputInt("Output height", &state.outputEquirectHeight);
-        state.outputEquirectWidth = std::max(16, state.outputEquirectWidth);
-        state.outputEquirectHeight = std::max(16, state.outputEquirectHeight);
+        DrawSizeLabel("Width", state.outputEquirectWidth);
+        DrawSizeLabel("Height", state.outputEquirectHeight);
+    }
+    else if(state.outputProjection == ProjectionType::Skybox)
+    {
+        DrawSizeLabel("Face size", state.outputSkyboxSize);
     }
     else
     {
-        ImGui::InputInt("Output side length", &state.outputCubeSide);
-        state.outputCubeSide = std::max(16, state.outputCubeSide);
+        DrawSizeLabel("Hemisphere size", state.outputHemisphericalSize);
     }
 
     ImGui::InputText("Output directory", state.outputDirectory.data(), state.outputDirectory.size());
@@ -115,14 +153,90 @@ void OutputPanel::DrawConvertedOutputs(GuiState& state)
         RebuildOutputTextures(state);
     }
 
+    openOutputPreviewThisFrame = false;
+
     for(size_t i = 0; i < state.convertedImages.size() && i < outputTextures.size(); ++i)
     {
         ImGui::TextUnformatted(state.convertedLabels[i].c_str());
+        const EnvMapImage& image = state.convertedImages[i];
         GLuint tex = outputTextures[i];
         if(tex != 0)
         {
-            ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), ImVec2(200.0f, 200.0f));
+            ImVec2 previewSize = FitImageSize(image.GetWidth(), image.GetHeight(), 220.0f);
+            ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), previewSize);
+            if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            {
+                outputPreviewIndex = static_cast<int>(i);
+                outputPreviewOpen = true;
+                openOutputPreviewThisFrame = true;
+            }
         }
+    }
+
+    if(openOutputPreviewThisFrame)
+    {
+        ImGui::OpenPopup("OutputPreviewModal");
+    }
+
+    DrawOutputPreviewModal(state);
+}
+
+void OutputPanel::DrawOutputPreviewModal(GuiState& state)
+{
+    if(!outputPreviewOpen)
+        return;
+
+    const ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImVec2 viewportSize = viewport ? viewport->Size : ImVec2(1280.0f, 720.0f);
+    ImVec2 modalSize(viewportSize.x * 0.75f, viewportSize.y * 0.75f);
+    ImGui::SetNextWindowSize(modalSize, ImGuiCond_Appearing);
+
+    bool modalOpen = true;
+    if(ImGui::BeginPopupModal("OutputPreviewModal", &modalOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if(outputPreviewIndex < 0 || outputPreviewIndex >= static_cast<int>(state.convertedImages.size()))
+        {
+            ImGui::TextUnformatted("No image available");
+        }
+        else
+        {
+            const EnvMapImage& image = state.convertedImages[outputPreviewIndex];
+            std::string label = state.convertedLabels[outputPreviewIndex];
+            ImGui::TextUnformatted(label.c_str());
+            GLuint tex = (outputPreviewIndex < static_cast<int>(outputTextures.size())) ?
+                outputTextures[outputPreviewIndex] : 0;
+            if(tex != 0)
+            {
+                ImVec2 avail = ImGui::GetContentRegionAvail();
+                float maxEdge = std::min(avail.x, avail.y);
+                if(maxEdge <= 0.0f)
+                    maxEdge = std::min(modalSize.x, modalSize.y) - 40.0f;
+                float texW = static_cast<float>(image.GetWidth());
+                float texH = static_cast<float>(image.GetHeight());
+                float scale = 1.0f;
+                if(texW > maxEdge || texH > maxEdge)
+                {
+                    float scaleW = maxEdge / texW;
+                    float scaleH = maxEdge / texH;
+                    scale = std::min(scaleW, scaleH);
+                }
+                ImVec2 size(texW * scale, texH * scale);
+                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), size);
+            }
+        }
+
+        if(ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+            modalOpen = false;
+        }
+        ImGui::EndPopup();
+    }
+
+    if(!modalOpen)
+    {
+        outputPreviewOpen = false;
+        outputPreviewIndex = -1;
     }
 }
 
