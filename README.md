@@ -24,6 +24,17 @@ Program Documentation (Coming soon)
 Theory behind Equirectangular Projection (Coming soon)
 CubeMap to Equirectangular Projection (Coming soon)
 
+
+# You will need GLFW (http://www.glfw.org):
+```
+ Linux:
+   apt-get install libglfw-dev
+ Mac OS X:
+   brew install glfw
+ MSYS2:
+   pacman -S --noconfirm --needed mingw-w64-x86_64-toolchain mingw-w64-x86_64-glfw
+```
+
 ## Credits:
 
 * Eric Christian (@Raygoe) for his insight and improvements on the C++ side. 
