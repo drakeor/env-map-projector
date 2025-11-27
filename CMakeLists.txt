@@ -6,7 +6,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 #set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS} -std=c++17")
 
-add_subdirectory(lib/Catch2)
+add_subdirectory(lib/catch2)
 
 set(SourceFiles 
     src/Coordinates/CoordConversions.cpp

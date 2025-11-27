@@ -1,6 +1,7 @@
 # Project Specific
 ####
 
+build/
 bin
 assets/testoutput/*.png
 bin/assets/testoutput/*.png

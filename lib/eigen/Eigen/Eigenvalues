@@ -15,24 +15,23 @@
 #include "Householder"
 #include "LU"
 #include "Geometry"
+#include "Sparse"  // Needed by ComplexQZ.
 
 #include "src/Core/util/DisableStupidWarnings.h"
 
 /** \defgroup Eigenvalues_Module Eigenvalues module
-  *
-  *
-  *
-  * This module mainly provides various eigenvalue solvers.
-  * This module also provides some MatrixBase methods, including:
-  *  - MatrixBase::eigenvalues(),
-  *  - MatrixBase::operatorNorm()
-  *
-  * \code
-  * #include <Eigen/Eigenvalues>
-  * \endcode
-  */
-
-#include "src/misc/RealSvd2x2.h"
+ *
+ *
+ *
+ * This module mainly provides various eigenvalue solvers.
+ * This module also provides some MatrixBase methods, including:
+ *  - MatrixBase::eigenvalues(),
+ *  - MatrixBase::operatorNorm()
+ *
+ * \code
+ * #include <Eigen/Eigenvalues>
+ * \endcode
+ */
 
 // IWYU pragma: begin_exports
 #include "src/Eigenvalues/Tridiagonalization.h"
@@ -44,6 +43,7 @@
 #include "src/Eigenvalues/ComplexSchur.h"
 #include "src/Eigenvalues/ComplexEigenSolver.h"
 #include "src/Eigenvalues/RealQZ.h"
+#include "src/Eigenvalues/ComplexQZ.h"
 #include "src/Eigenvalues/GeneralizedEigenSolver.h"
 #include "src/Eigenvalues/MatrixBaseEigenvalues.h"
 #ifdef EIGEN_USE_LAPACKE
@@ -60,4 +60,4 @@
 
 #include "src/Core/util/ReenableStupidWarnings.h"
 
-#endif // EIGEN_EIGENVALUES_MODULE_H
+#endif  // EIGEN_EIGENVALUES_MODULE_H
