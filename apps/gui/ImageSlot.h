@@ -1,0 +1,44 @@
+#ifndef IMAGE_SLOT_H
+#define IMAGE_SLOT_H
+
+#include <array>
+#include <memory>
+#include <string>
+
+#include <GLFW/glfw3.h>
+
+#include "Utils/EnvMapImage.h"
+
+class ImageSlot
+{
+public:
+    static constexpr size_t PathBufferSize = 512;
+
+    explicit ImageSlot(const std::string& label);
+    ~ImageSlot();
+
+    const std::string& GetLabel() const;
+    char* GetPathBuffer();
+    const char* GetPathBuffer() const;
+
+    bool LoadFromDisk();
+    void Clear();
+
+    bool HasImage() const;
+    int GetWidth() const;
+    int GetHeight() const;
+    const EnvMapImage* GetImage() const;
+
+    GLuint GetTextureId() const;
+
+private:
+    void UploadTexture();
+    void ReleaseTexture();
+
+    std::string label;
+    std::array<char, PathBufferSize> pathBuffer;
+    std::shared_ptr<EnvMapImage> image;
+    GLuint textureId;
+};
+
+#endif

@@ -24,27 +24,27 @@ EnvMapImage::~EnvMapImage()
 
 }
 
-bool EnvMapImage::IsValid()
+bool EnvMapImage::IsValid() const
 {
     return (data.get() != nullptr);
 }
 
-int EnvMapImage::GetWidth()
+int EnvMapImage::GetWidth() const
 {
     return width;
 }
 
-int EnvMapImage::GetHeight()
+int EnvMapImage::GetHeight() const
 {
     return height;
 }
 
-size_t EnvMapImage::GetDataSize()
+size_t EnvMapImage::GetDataSize() const
 {
     return dataSize;
 }
 
-unsigned int EnvMapImage::GetPixel(int x, int y)
+unsigned int EnvMapImage::GetPixel(int x, int y) const
 {
     unsigned int pixel = 0;
 
@@ -85,7 +85,7 @@ void EnvMapImage::SetPixel(int x, int y, unsigned int pixelValue)
     data.get()[index+3] = pixelValue & 0xFF;
 }
 
-std::shared_ptr<unsigned char> EnvMapImage::GetData()
+std::shared_ptr<unsigned char> EnvMapImage::GetData() const
 {
     return data;
 }

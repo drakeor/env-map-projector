@@ -12,16 +12,16 @@ public:
     EnvMapImage(int _width, int _height);
     ~EnvMapImage();
     
-    bool IsValid();
+    bool IsValid() const;
 
-    int GetWidth();
-    int GetHeight();
-    size_t GetDataSize();
+    int GetWidth() const;
+    int GetHeight() const;
+    size_t GetDataSize() const;
 
-    unsigned int GetPixel(int x, int y);
+    unsigned int GetPixel(int x, int y) const;
     void SetPixel(int x, int y, unsigned int pixelValue);
 
-    std::shared_ptr<unsigned char> GetData();
+    std::shared_ptr<unsigned char> GetData() const;
 
 private:
     int width;
