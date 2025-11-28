@@ -21,7 +21,6 @@ set(SourceFiles
     src/Utils/EnvMapImage.cpp
     src/Utils/ImageReader.cpp
     src/Utils/ImageWriter.cpp
-    src/Utils/ProjectionSizing.cpp
 )
 
 # Core library used by every executable/test target
@@ -48,7 +47,6 @@ add_executable (envmapproj_tests
     tests/ImageWriterTests.cpp
     tests/SkyboxProjectionTests.cpp
     tests/HemisphericalProjectionTests.cpp
-    tests/ProjectionSizingTests.cpp
 )
 target_link_libraries(envmapproj_tests PRIVATE envmapcore Catch2::Catch2WithMain)
 

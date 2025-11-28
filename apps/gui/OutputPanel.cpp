@@ -86,8 +86,6 @@ void OutputPanel::DrawOutputSettings(GuiState& state)
         state.outputScale = std::clamp(state.outputScale, 0.5f, 4.0f);
     }
 
-    ImGui::Checkbox("Hemispherical artifact reduction", &state.hemisphereArtifactReduction);
-
     ImGui::SeparatorText("Output size");
     if(state.outputProjection == ProjectionType::Equirectangular)
     {

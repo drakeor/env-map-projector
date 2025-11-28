@@ -10,7 +10,6 @@
 
 #include "GuiState.h"
 #include "ImageSlot.h"
-#include "Utils/ProjectionSizing.h"
 
 class ConversionController
 {
@@ -33,7 +32,6 @@ private:
         ProjectionType inputProjection;
         ProjectionType outputProjection;
         AutoScaleMode autoScaleMode;
-        ProjectionSizing::HemisphereSizingMode hemisphereMode;
         float outputScale;
         int outputWidth;
         int outputHeight;

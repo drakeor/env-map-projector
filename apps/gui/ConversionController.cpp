@@ -1,7 +1,6 @@
 #include "ConversionController.h"
 
 #include <algorithm>
-#include <array>
 #include <cmath>
 #include <memory>
 #include <string>
@@ -10,10 +9,28 @@
 #include "Projections/EquirectangularProjection.h"
 #include "Projections/SkyboxProjection.h"
 #include "Projections/HemisphericalProjection.h"
-#include "Utils/ProjectionSizing.h"
 
 namespace
 {
+constexpr int kMinDimension = 16;
+constexpr int kDefaultEquirectWidth = 2048;
+constexpr int kDefaultEquirectHeight = 1024;
+constexpr int kDefaultCubeFace = 512;
+constexpr int kDefaultHemisphere = 1024;
+
+struct SizeSet
+{
+    int equirectWidth;
+    int equirectHeight;
+    int cubeFace;
+    int hemisphereSize;
+};
+
+int ClampDimension(int value)
+{
+    return std::max(value, kMinDimension);
+}
+
 std::vector<std::string> SkyboxLabels()
 {
     return {"top", "bottom", "left", "right", "front", "back"};
@@ -38,8 +55,8 @@ int ExtractSkyboxFaceSize(const std::vector<EnvMapImage>& images)
             face = std::min(face, candidate);
     }
     if(face == 0)
-        face = 1024;
-    return std::max(face, 16);
+        face = kDefaultCubeFace;
+    return ClampDimension(face);
 }
 
 int ExtractHemisphereSquareSize(const std::vector<EnvMapImage>& images)
@@ -56,26 +73,56 @@ int ExtractHemisphereSquareSize(const std::vector<EnvMapImage>& images)
             square = std::min(square, candidate);
     }
     if(square == 0)
-        square = 2048;
-    return std::max(square, 16);
+        square = kDefaultHemisphere;
+    return ClampDimension(square);
 }
 
-ProjectionSizing::SizeSet BuildSizeSet(ProjectionType projection, const std::vector<EnvMapImage>& images,
-    ProjectionSizing::HemisphereSizingMode hemiMode)
+SizeSet FromEquirectInput(const std::vector<EnvMapImage>& images)
 {
-    using namespace ProjectionSizing;
+    int width = images.empty() ? kDefaultEquirectWidth : images[0].GetWidth();
+    int height = images.empty() ? kDefaultEquirectHeight : images[0].GetHeight();
+    width = ClampDimension(width);
+    height = ClampDimension(height);
+    int face = std::min(width / 4, height / 2);
+    if(face <= 0)
+        face = std::max(width / 4, height / 2);
+    if(face <= 0)
+        face = kDefaultCubeFace;
+    face = ClampDimension(face);
+    int hemisphere = ClampDimension(height);
+    return {width, height, face, hemisphere};
+}
+
+SizeSet FromSkyboxInput(const std::vector<EnvMapImage>& images)
+{
+    int face = ExtractSkyboxFaceSize(images);
+    int equirectWidth = ClampDimension(face * 4);
+    int equirectHeight = ClampDimension(face * 2);
+    int hemisphere = ClampDimension(face * 2);
+    return {equirectWidth, equirectHeight, face, hemisphere};
+}
+
+SizeSet FromHemisphereInput(const std::vector<EnvMapImage>& images)
+{
+    int hemisphere = ExtractHemisphereSquareSize(images);
+    int equirectWidth = ClampDimension(hemisphere * 2);
+    int equirectHeight = ClampDimension(hemisphere);
+    int face = ClampDimension(std::max(hemisphere / 2, kMinDimension));
+    return {equirectWidth, equirectHeight, face, hemisphere};
+}
+
+SizeSet BuildSizeSet(ProjectionType projection, const std::vector<EnvMapImage>& images)
+{
     switch(projection)
     {
         case ProjectionType::Equirectangular:
-            if(!images.empty())
-                return FromEquirectangular(images[0].GetWidth(), images[0].GetHeight(), hemiMode);
-            return FromEquirectangular(2048, 1024, hemiMode);
+            return FromEquirectInput(images);
         case ProjectionType::Skybox:
-            return FromCubemapFace(ExtractSkyboxFaceSize(images), hemiMode);
+            return FromSkyboxInput(images);
         case ProjectionType::Hemispherical:
-            return FromHemispherical(ExtractHemisphereSquareSize(images), hemiMode);
+            return FromHemisphereInput(images);
     }
-    return FromEquirectangular(2048, 1024, hemiMode);
+    return FromEquirectInput(images);
 }
 }
 
@@ -160,8 +207,6 @@ bool ConversionController::StartConversion(GuiState& state, const std::vector<Im
     params.inputProjection = state.inputProjection;
     params.outputProjection = state.outputProjection;
     params.autoScaleMode = state.autoScaleMode;
-    params.hemisphereMode = state.hemisphereArtifactReduction ?
-        ProjectionSizing::HemisphereSizingMode::ArtifactReduction : ProjectionSizing::HemisphereSizingMode::Identity;
     params.outputScale = state.outputScale;
     params.outputWidth = 0;
     params.outputHeight = 0;
@@ -231,7 +276,7 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
         return std::max(scaled, 16);
     };
 
-    ProjectionSizing::SizeSet sizeSet = BuildSizeSet(params.inputProjection, images, params.hemisphereMode);
+    SizeSet sizeSet = BuildSizeSet(params.inputProjection, images);
 
     std::shared_ptr<EnvProj::CoordContainerBase<double>> coords;
     switch(params.inputProjection)
@@ -277,7 +322,7 @@ void ConversionController::WorkerThread(ConversionParams params, std::vector<Slo
     }
     else if(params.outputProjection == ProjectionType::Skybox)
     {
-        int face = scaleDimension(sizeSet.cubemapFace);
+        int face = scaleDimension(sizeSet.cubeFace);
         computedWidth = computedHeight = face;
     }
     else

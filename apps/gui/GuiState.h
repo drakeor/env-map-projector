@@ -28,7 +28,6 @@ struct GuiState
     ProjectionType outputProjection = ProjectionType::Skybox;
     AutoScaleMode autoScaleMode = AutoScaleMode::ScaleToLargest;
     float outputScale = 1.0f;
-    bool hemisphereArtifactReduction = true;
 
     int uiScaleIndex = 1;
     float uiScale = 2.0f;
