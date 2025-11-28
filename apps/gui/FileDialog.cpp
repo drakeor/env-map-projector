@@ -1,103 +1,46 @@
 #include "FileDialog.h"
 
-#include <array>
-#include <cstdio>
-#include <cstdlib>
 #include <filesystem>
-#include <memory>
-#include <sstream>
+#include <string>
+#include <vector>
+
+#include "portable-file-dialogs.h"
 
 namespace
 {
-std::string EscapePath(const std::string& path)
+std::string ResolveInitialPath(const std::string& defaultPath)
 {
-    std::ostringstream oss;
-    for(char c : path)
-    {
-        if(c == '"')
-            oss << "\\\"";
-        else
-            oss << c;
-    }
-    return oss.str();
+    if(defaultPath.empty())
+        return std::filesystem::current_path().string();
+
+    std::filesystem::path path(defaultPath);
+    std::error_code ec;
+    if(std::filesystem::is_regular_file(path, ec))
+        path = path.parent_path();
+
+    if(path.empty())
+        return defaultPath;
+
+    return path.string();
 }
 }
 
 std::string FileDialog::OpenImageFile(const std::string& defaultPath)
 {
-    std::string command;
-    std::string basePath = defaultPath.empty() ? std::filesystem::current_path().string() : defaultPath;
-    if(CommandExists("zenity"))
-    {
-        command = "zenity --file-selection --title=\"Select image\" --file-filter=\"Images | *.png *.jpg *.jpeg *.hdr *.exr *.tga\"";
-        command += " --filename=\"" + EscapePath(basePath) + "/\"";
-    }
-    else if(CommandExists("kdialog"))
-    {
-        command = "kdialog --getopenfilename \"" + EscapePath(basePath) + "\" \"*.png *.jpg *.jpeg *.hdr *.exr *.tga\"";
-    }
-    else
-    {
-        return {};
-    }
+    static const std::vector<std::string> filters = {
+        "Image Files", "*.png *.jpg *.jpeg *.hdr *.exr *.tga *.bmp",
+        "All Files", "*"
+    };
 
-    return Trim(RunCommand(command));
+    auto selection = pfd::open_file("Select image", ResolveInitialPath(defaultPath), filters).result();
+    if(selection.empty())
+        return {};
+
+    return selection.front();
 }
 
 std::string FileDialog::SelectDirectory(const std::string& defaultPath)
 {
-    std::string command;
-    std::string basePath = defaultPath.empty() ? std::filesystem::current_path().string() : defaultPath;
-    if(CommandExists("zenity"))
-    {
-        command = "zenity --file-selection --directory --title=\"Select directory\"";
-        command += " --filename=\"" + EscapePath(basePath) + "/\"";
-    }
-    else if(CommandExists("kdialog"))
-    {
-        command = "kdialog --getexistingdirectory \"" + EscapePath(basePath) + "\"";
-    }
-    else
-    {
-        return {};
-    }
-
-    return Trim(RunCommand(command));
-}
-
-bool FileDialog::CommandExists(const char* command)
-{
-    std::string checkCmd = "command -v ";
-    checkCmd += command;
-    checkCmd += " >/dev/null 2>&1";
-    int result = std::system(checkCmd.c_str());
-    return (result == 0);
-}
-
-std::string FileDialog::RunCommand(const std::string& command)
-{
-    std::string result;
-    std::array<char, 1024> buffer;
-
-    FILE* pipe = popen(command.c_str(), "r");
-    if(!pipe)
-        return result;
-
-    while(fgets(buffer.data(), static_cast<int>(buffer.size()), pipe) != nullptr)
-    {
-        result += buffer.data();
-    }
-
-    int rc = pclose(pipe);
-    (void)rc;
-    return result;
-}
-
-std::string FileDialog::Trim(const std::string& value)
-{
-    size_t start = value.find_first_not_of("\r\n\t ");
-    size_t end = value.find_last_not_of("\r\n\t ");
-    if(start == std::string::npos)
-        return {};
-    return value.substr(start, end - start + 1);
+    auto folder = pfd::select_folder("Select directory", ResolveInitialPath(defaultPath)).result();
+    return folder;
 }

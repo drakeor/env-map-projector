@@ -50,6 +50,7 @@ OutputPanel::~OutputPanel()
 void OutputPanel::Draw(GuiState& state, InputPanel& inputPanel, ConversionController& controller)
 {
     openSaveOutputsModalThisFrame = false;
+
     DrawProjectionSelector(state);
 
     ImGui::SeparatorText("Output Options");
