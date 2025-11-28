@@ -170,3 +170,6 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
 
     return skyboxImgs;
 }
+
+template class SkyboxProjection<float>;
+template class SkyboxProjection<double>;

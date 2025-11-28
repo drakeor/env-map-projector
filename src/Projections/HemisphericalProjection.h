@@ -30,8 +30,8 @@ namespace EnvProj
     private:
     };
 
-    template class HemisphericalProjection<float>;
-    template class HemisphericalProjection<double>;
+    extern template class HemisphericalProjection<float>;
+    extern template class HemisphericalProjection<double>;
 }
 
 #endif

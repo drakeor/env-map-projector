@@ -136,6 +136,9 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
     return skydomeImages;
 }
 
+template class HemisphericalProjection<float>;
+template class HemisphericalProjection<double>;
+
 /*
 template <typename T>
 PointSphere<T> HemisphericalProjection<T>::UVToSpherical(T u, T v)

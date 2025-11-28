@@ -87,3 +87,6 @@ PointSphere<T> EquirectangularProjection<T>::UVToSpherical(T u, T v)
     return newPoint;
 }
 
+template class EquirectangularProjection<float>;
+template class EquirectangularProjection<double>;
+

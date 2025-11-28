@@ -31,8 +31,8 @@ namespace EnvProj
     private:
     };
 
-    template class SkyboxProjection<float>;
-    template class SkyboxProjection<double>;
+    extern template class SkyboxProjection<float>;
+    extern template class SkyboxProjection<double>;
 }
 
 #endif
