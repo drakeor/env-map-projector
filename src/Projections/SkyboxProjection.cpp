@@ -3,6 +3,7 @@
 #include "../Coordinates/CoordConversions.h"
 
 #include <memory>
+#include <cmath>
 
 using namespace Eigen;
 using namespace EnvProj;
@@ -142,6 +143,15 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
                 cartCoord.x = uvCoord[coordMap.x];
                 cartCoord.y = uvCoord[coordMap.y];
                 cartCoord.z = uvCoord[coordMap.z];
+
+                T length = std::sqrt(cartCoord.x * cartCoord.x +
+                    cartCoord.y * cartCoord.y + cartCoord.z * cartCoord.z);
+                if(length > 0)
+                {
+                    cartCoord.x /= length;
+                    cartCoord.y /= length;
+                    cartCoord.z /= length;
+                }
 
                 uint32_t pixelData = coords->GetClosestPixel(cartCoord.x, cartCoord.y, cartCoord.z);
 

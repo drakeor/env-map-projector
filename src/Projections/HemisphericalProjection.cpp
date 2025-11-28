@@ -1,6 +1,9 @@
 #include "HemisphericalProjection.h"
 #include "../Coordinates/CoordContainerHemiSpherical.h"
 
+#include <algorithm>
+#include <cmath>
+
 using namespace EnvProj;
 using namespace std;
 
@@ -92,7 +95,24 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
             // Only worry about getting coordinates and setting pixels
             // if the L2 <= 1
             T len_squared = x_coord*x_coord + y_coord*y_coord;
-            if(len_squared > 1.0f) {
+            const T epsilon = static_cast<T>(1e-4);
+            if(len_squared > 1.0f)
+            {
+                if(len_squared <= 1.0f + epsilon)
+                {
+                    T len = static_cast<T>(std::sqrt(static_cast<double>(len_squared)));
+                    if(len > 0)
+                    {
+                        const T shrink = static_cast<T>(1e-6);
+                        T clampScale = (static_cast<T>(1.0f) - shrink) / len;
+                        x_coord *= clampScale;
+                        y_coord *= clampScale;
+                        len_squared = x_coord*x_coord + y_coord*y_coord;
+                    }
+                }
+            }
+            if(len_squared > 1.0f)
+            {
                 skydomeImages[0].SetPixel(i, j, 0x00);
                 skydomeImages[1].SetPixel(i, j, 0x00);
                 continue;
@@ -100,7 +120,7 @@ std::array<EnvMapImage,2> HemisphericalProjection<T>::ConvertToImages(CoordConta
 
             // Derive z coordinate by re-arranging the equation for 
             // a unit sphere.
-            T z_coord = sqrtf(1.0f - len_squared);
+            T z_coord = static_cast<T>(std::sqrt(std::max(static_cast<T>(0.0f), static_cast<T>(1.0f) - len_squared)));
 
             //std::cout << len_squared << "," << z_coord << std::endl;
 
