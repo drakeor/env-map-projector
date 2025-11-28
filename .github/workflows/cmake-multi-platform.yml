@@ -53,16 +53,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y pkg-config libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
 
-    - name: Setup vcpkg (Windows)
-      if: runner.os == 'Windows'
-      uses: microsoft/setup-vcpkg@v1
-      with:
-        vcpkg-triplet: x64-windows
-
     - name: Install GLFW via vcpkg (Windows)
       if: runner.os == 'Windows'
-      shell: pwsh
-      run: vcpkg install glfw3 --clean-after-build
+      id: vcpkg
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgGitCommitId: master
+        vcpkgArguments: glfw3
+        vcpkgTriplet: x64-windows
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -71,7 +69,7 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         if [ "$RUNNER_OS" = "Windows" ]; then
-          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_OUTPUT"
+          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=${{ steps.vcpkg.outputs.vcpkgRoot }}/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_OUTPUT"
         else
           echo "cmake-toolchain=" >> "$GITHUB_OUTPUT"
         fi
