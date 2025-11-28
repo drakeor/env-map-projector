@@ -99,13 +99,89 @@ A complete guide to the theory behind the code can be found on [my blog](https:/
 
 ## Building from source
 
-### Pre-requisites
+### Prerequisites
 
-Note this repository has a copy of all the libraries (with the version I used) inside the ```lib/``` folder for convenience. Beyond that, you need the following:
+All library dependencies (Catch2, Eigen3, GLFW, ImGui, STB, Portable File Dialogs) are managed by [vcpkg](https://github.com/microsoft/vcpkg) and will be automatically downloaded and built during the CMake configuration phase.
 
-- CMAKE
-- GLFW (```apt-get install libglfw-dev``` on linux)
-- OpenGL libraries
+**Common Requirements (All Platforms):**
+- **CMake** 3.21 or higher (required for CMakePresets.json support)
+- **vcpkg** - Microsoft's C++ package manager ([installation guide](https://github.com/microsoft/vcpkg#get-started))
+- **C++17 compatible compiler**
+
+**Platform-Specific Requirements:**
+
+<details>
+<summary><b>Linux (Ubuntu/Debian)</b></summary>
+
+**Compiler:** GCC 7+ or Clang 5+
+
+**System Dependencies:**
+```bash
+sudo apt-get update
+sudo apt-get install -y \
+    build-essential \
+    pkg-config \
+    ninja-build \
+    libglfw3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    xorg-dev
+```
+
+**vcpkg Setup:**
+```bash
+# Clone vcpkg if you haven't already
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg && ./bootstrap-vcpkg.sh
+export VCPKG_ROOT=$(pwd)
+```
+</details>
+
+<details>
+<summary><b>macOS (Apple Silicon & Intel)</b></summary>
+
+**Compiler:** Apple Clang 12+ (Xcode Command Line Tools)
+
+**System Dependencies:**
+```bash
+# Install Xcode Command Line Tools
+xcode-select --install
+
+# Install Homebrew dependencies
+brew install ninja pkg-config autoconf automake libtool
+```
+
+**vcpkg Setup:**
+```bash
+# Clone vcpkg if you haven't already
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg && ./bootstrap-vcpkg.sh
+export VCPKG_ROOT=$(pwd)
+```
+</details>
+
+<details>
+<summary><b>Windows</b></summary>
+
+**Compiler:** Visual Studio 2019 or newer (MSVC 19.20+)
+
+**Required Components:**
+- Visual Studio with "Desktop development with C++" workload
+- Windows 10 SDK
+
+**vcpkg Setup:**
+```powershell
+# Clone vcpkg if you haven't already
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+.\bootstrap-vcpkg.bat
+$env:VCPKG_ROOT = (Get-Location).Path
+```
+
+**Note:** You can also use the Visual Studio Developer Command Prompt which has all necessary tools pre-configured.
+</details>
 
 ### Building
 
@@ -135,13 +211,13 @@ Note: These are provided by the [vcpkg](https://github.com/microsoft/vcpkg?tab=r
 
 * Eric Christian (@Raygoe) for his insight and improvements on the C++ side. 
 
-* (LearnOpenGl.com)[https://learnopengl.com/Advanced-OpenGL/Cubemaps] which is where I got the Skybox from
+* [LearnOpenGl.com](https://learnopengl.com/Advanced-OpenGL/Cubemaps) which is where I got the Skybox from
 
-* (Timothy Oldfield)[https://unsplash.com/@oldfieldart] for the Equirectangular texture.
+* [Timothy Oldfield](https://unsplash.com/@oldfieldart) for the Equirectangular texture.
 
-* (Tutorials for Blender3d)[https://tutorialsforblender3d.com/] for the skysphere texture.
+* [Tutorials for Blender3d](https://tutorialsforblender3d.com/) for the skysphere texture.
 
-* (Solar System Scope)[https://www.solarsystemscope.com/textures/] for 8k texture tests.
+* [Solar System Scope](https://www.solarsystemscope.com/textures/) for 8k texture tests.
 
 
 ### License
