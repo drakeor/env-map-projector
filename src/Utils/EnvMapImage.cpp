@@ -1,22 +1,27 @@
 #include "EnvMapImage.h"
 
+#include <algorithm>
+#include <cstring>
+
 using namespace std;
 
 EnvMapImage::EnvMapImage(int _width, int _height,
     unsigned char* _data, size_t _dataSize)
 {
-    width = _width;
-    height = _height;
-    data = std::shared_ptr<unsigned char>(_data);
-    dataSize = _dataSize;
+    AllocateStorage(_width, _height);
+    size_t copySize = dataSize;
+    if(_dataSize > 0)
+        copySize = std::min(copySize, _dataSize);
+    CopyFrom(_data, copySize);
 }
 
 EnvMapImage::EnvMapImage(int _width, int _height)
 {
-    width = _width;
-    height = _height;
-    dataSize = _width * _height * 4;
-    data = std::shared_ptr<unsigned char>(new unsigned char[dataSize]);
+    AllocateStorage(_width, _height);
+    if(data)
+    {
+        std::memset(data.get(), 0, dataSize);
+    }
 }
 
 EnvMapImage::~EnvMapImage()
@@ -88,4 +93,29 @@ void EnvMapImage::SetPixel(int x, int y, unsigned int pixelValue)
 std::shared_ptr<unsigned char> EnvMapImage::GetData() const
 {
     return data;
+}
+
+void EnvMapImage::AllocateStorage(int newWidth, int newHeight)
+{
+    width = newWidth;
+    height = newHeight;
+    if(width <= 0 || height <= 0)
+    {
+        dataSize = 0;
+        data.reset();
+        return;
+    }
+    dataSize = static_cast<size_t>(width) * static_cast<size_t>(height) * 4u;
+    data = std::shared_ptr<unsigned char>(new unsigned char[dataSize], std::default_delete<unsigned char[]>());
+}
+
+void EnvMapImage::CopyFrom(const unsigned char* src, size_t byteCount)
+{
+    if(!data || byteCount == 0 || src == nullptr)
+        return;
+    std::memcpy(data.get(), src, byteCount);
+    if(byteCount < dataSize)
+    {
+        std::memset(data.get() + byteCount, 0, dataSize - byteCount);
+    }
 }

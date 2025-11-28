@@ -27,5 +27,6 @@ EnvMapImage ImageReader::LoadImage(string fileName)
     size_t imageSize = width * height * 4;
 
     EnvMapImage envMapImage(width, height, imageData, imageSize);
+    stbi_image_free(imageData);
     return envMapImage;
 }

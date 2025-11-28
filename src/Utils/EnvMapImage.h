@@ -1,13 +1,13 @@
 #ifndef _WORKING_IMAGE_H_
 #define _WORKING_IMAGE_H_
 
-#include <utility>
+#include <cstddef>
 #include <memory>
 
 class EnvMapImage
 {
 public:
-    EnvMapImage(int _width, int _height,  
+    EnvMapImage(int _width, int _height,
         unsigned char* _data, size_t _dataSize);
     EnvMapImage(int _width, int _height);
     ~EnvMapImage();
@@ -28,6 +28,9 @@ private:
     int height;
     std::shared_ptr<unsigned char> data;
     size_t dataSize;
+
+    void AllocateStorage(int newWidth, int newHeight);
+    void CopyFrom(const unsigned char* src, size_t byteCount);
 };
 
 #endif
