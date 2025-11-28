@@ -84,7 +84,7 @@ else()
         set(GLFW_LINK_LIBS ${GLFW_LIBRARIES})
         set(GLFW_INCLUDE_DIRS ${GLFW_INCLUDE_DIRS})
     else()
-        message(FATAL_ERROR "GLFW not found. Install glfw3 or provide a pkg-config file.")
+        message(FATAL_ERROR "GLFW not found. Install glfw3 or provide a pkg-config file, or provide glfw3Config.cmake via vcpkg/toolchain.")
     endif()
 endif()
 

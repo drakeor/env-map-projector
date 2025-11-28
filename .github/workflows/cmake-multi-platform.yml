@@ -33,16 +33,16 @@ jobs:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
         exclude:
           - os: windows-latest
             c_compiler: gcc
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
-            c_compiler: cl
+            c_compiler: cl'
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
 
     steps:
     - uses: actions/checkout@v4
@@ -62,14 +62,22 @@ jobs:
         vcpkgArguments: glfw3
         vcpkgTriplet: x64-windows
 
+    - name: Cache vcpkg root path
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        echo "VCPKG_ROOT=${{ steps.vcpkg.outputs.vcpkgRoot }}" >> "$GITHUB_ENV"
+
     - name: Set reusable strings
-      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      # Turn repeated input strings (such   as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
       id: strings
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         if [ "$RUNNER_OS" = "Windows" ]; then
-          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=\"${VCPKG_ROOT//\\/\/}/scripts/buildsystems/vcpkg.cmake\"" >> "$GITHUB_OUTPUT"
+          TOOLCHAIN_PATH="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          TOOLCHAIN_PATH="${TOOLCHAIN_PATH//\\/\/}"
+          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_PATH}" >> "$GITHUB_OUTPUT"
         else
           echo "cmake-toolchain=" >> "$GITHUB_OUTPUT"
         fi
