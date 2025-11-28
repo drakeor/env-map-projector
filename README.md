@@ -211,13 +211,13 @@ Note: These are provided by the [vcpkg](https://github.com/microsoft/vcpkg?tab=r
 
 * Eric Christian (@Raygoe) for his insight and improvements on the C++ side. 
 
-* (LearnOpenGl.com)[https://learnopengl.com/Advanced-OpenGL/Cubemaps] which is where I got the Skybox from
+* [LearnOpenGl.com](https://learnopengl.com/Advanced-OpenGL/Cubemaps) which is where I got the Skybox from
 
-* (Timothy Oldfield)[https://unsplash.com/@oldfieldart] for the Equirectangular texture.
+* [Timothy Oldfield](https://unsplash.com/@oldfieldart) for the Equirectangular texture.
 
-* (Tutorials for Blender3d)[https://tutorialsforblender3d.com/] for the skysphere texture.
+* [Tutorials for Blender3d](https://tutorialsforblender3d.com/) for the skysphere texture.
 
-* (Solar System Scope)[https://www.solarsystemscope.com/textures/] for 8k texture tests.
+* [Solar System Scope](https://www.solarsystemscope.com/textures/) for 8k texture tests.
 
 
 ### License
