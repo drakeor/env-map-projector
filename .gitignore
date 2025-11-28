@@ -1,6 +1,7 @@
 # Project Specific
 ####
 
+imgui.ini
 build/
 bin
 assets/testoutput/*.png

@@ -136,8 +136,6 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
 
                 // Transform uv to cartesian coordinates
                 // Convert f:[u,v,c] -> [x,y,z]
-                //Eigen::Vector3f cartCoord;
-                //std::array<T, 3> cartCoord = {0, 0, 0};
                 Point3d<T> cartCoord;
 
                 cartCoord.x = uvCoord[coordMap.x];
@@ -154,13 +152,6 @@ std::array<EnvMapImage, 6> SkyboxProjection<T>::ConvertToImages(CoordContainerBa
                 }
 
                 uint32_t pixelData = coords->GetClosestPixel(cartCoord.x, cartCoord.y, cartCoord.z);
-
-                /*cartCoord(0) = uvCoord(coordMap.x);
-                cartCoord(1) = uvCoord(coordMap.y);
-                cartCoord(2) = uvCoord(coordMap.z);
-                
-                uint32_t pixelData = coords->GetClosestPixel(cartCoord.x(), cartCoord.y(), cartCoord.z());
-                */
 
                 // Lastly, convert to spherical coordinates and store.
                 skyboxImgs[k].SetPixel(i, j, pixelData);
