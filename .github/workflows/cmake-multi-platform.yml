@@ -58,7 +58,7 @@ jobs:
       id: vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: master
+        vcpkgGitCommitId: ae8fa5ae5e6162a88e412618245809ed2aa579d9
         vcpkgArguments: glfw3
         vcpkgTriplet: x64-windows
 
