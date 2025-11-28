@@ -129,8 +129,7 @@ The executables will be under `install-output/bin/` following successful install
 * GLFW for rendering the front end: https://www.glfw.org
 * Portable File Dialogs for well, the file dialogs: https://github.com/samhocevar/portable-file-dialogs
 
-
-Note: I know the default convention is to either submodule them, use fetch content in CMake, or tell you to install them, but I've been burned by that when cloning other libraries before and it's annoying to fix.
+Note: These are provided by the `vcpkg` project which is a requirement to build on most build systems these days so you probably already have it (along with CMake of course).
 
 ## Credits:
 
