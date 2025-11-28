@@ -12,17 +12,19 @@
 
 namespace
 {
-ImVec2 FitImageSize(int width, int height, float maxEdge)
+constexpr float kThumbnailEdge = 220.0f;
+
+ImVec2 ComputeThumbnailSize(int width, int height)
 {
     if(width <= 0 || height <= 0)
-        return ImVec2(maxEdge, maxEdge);
+        return ImVec2(kThumbnailEdge, kThumbnailEdge);
 
     float w = static_cast<float>(width);
     float h = static_cast<float>(height);
     float aspect = w / h;
     if(aspect >= 1.0f)
-        return ImVec2(maxEdge, maxEdge / aspect);
-    return ImVec2(maxEdge * aspect, maxEdge);
+        return ImVec2(kThumbnailEdge, kThumbnailEdge / aspect);
+    return ImVec2(kThumbnailEdge * aspect, kThumbnailEdge);
 }
 
 void DrawSizeLabel(const char* label, int value)
@@ -160,7 +162,7 @@ void OutputPanel::DrawConvertedOutputs(GuiState& state)
         GLuint tex = outputTextures[i];
         if(tex != 0)
         {
-            ImVec2 previewSize = FitImageSize(image.GetWidth(), image.GetHeight(), 220.0f);
+            ImVec2 previewSize = ComputeThumbnailSize(image.GetWidth(), image.GetHeight());
             ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), previewSize);
             if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
@@ -190,7 +192,8 @@ void OutputPanel::DrawOutputPreviewModal(GuiState& state)
     ImGui::SetNextWindowSize(modalSize, ImGuiCond_Appearing);
 
     bool modalOpen = true;
-    if(ImGui::BeginPopupModal("OutputPreviewModal", &modalOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
+    if(ImGui::BeginPopupModal("OutputPreviewModal", &modalOpen, flags))
     {
         if(outputPreviewIndex < 0 || outputPreviewIndex >= static_cast<int>(state.convertedImages.size()))
         {
@@ -206,18 +209,20 @@ void OutputPanel::DrawOutputPreviewModal(GuiState& state)
             if(tex != 0)
             {
                 ImVec2 avail = ImGui::GetContentRegionAvail();
-                float maxEdge = std::min(avail.x, avail.y);
-                if(maxEdge <= 0.0f)
-                    maxEdge = std::min(modalSize.x, modalSize.y) - 40.0f;
+                if(avail.x <= 0.0f || avail.y <= 0.0f)
+                {
+                    avail.x = modalSize.x - 40.0f;
+                    avail.y = modalSize.y - 80.0f;
+                }
                 float texW = static_cast<float>(image.GetWidth());
                 float texH = static_cast<float>(image.GetHeight());
-                float scale = 1.0f;
-                if(texW > maxEdge || texH > maxEdge)
-                {
-                    float scaleW = maxEdge / texW;
-                    float scaleH = maxEdge / texH;
-                    scale = std::min(scaleW, scaleH);
-                }
+                float scaleW = avail.x / texW;
+                float scaleH = avail.y / texH;
+                float scale = std::min(scaleW, scaleH);
+                if(scale > 1.0f)
+                    scale = 1.0f;
+                if(scale <= 0.0f)
+                    scale = 1.0f;
                 ImVec2 size(texW * scale, texH * scale);
                 ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), size);
             }

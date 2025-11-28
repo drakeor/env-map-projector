@@ -7,17 +7,19 @@
 
 namespace
 {
-ImVec2 FitImageSize(int width, int height, float maxEdge)
+constexpr float kThumbnailEdge = 220.0f;
+
+ImVec2 ComputeThumbnailSize(int width, int height)
 {
     if(width <= 0 || height <= 0)
-        return ImVec2(maxEdge, maxEdge);
+        return ImVec2(kThumbnailEdge, kThumbnailEdge);
 
     float w = static_cast<float>(width);
     float h = static_cast<float>(height);
     float aspect = w / h;
     if(aspect >= 1.0f)
-        return ImVec2(maxEdge, maxEdge / aspect);
-    return ImVec2(maxEdge * aspect, maxEdge);
+        return ImVec2(kThumbnailEdge, kThumbnailEdge / aspect);
+    return ImVec2(kThumbnailEdge * aspect, kThumbnailEdge);
 }
 }
 
@@ -88,7 +90,7 @@ void InputPanel::Draw(GuiState& state)
                 ImGui::Text("%dx%d", slot.GetWidth(), slot.GetHeight());
                 if(slot.GetTextureId() != 0)
                 {
-                    ImVec2 previewSize = FitImageSize(slot.GetWidth(), slot.GetHeight(), 220.0f);
+                    ImVec2 previewSize = ComputeThumbnailSize(slot.GetWidth(), slot.GetHeight());
                     ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), previewSize);
                     if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                     {
@@ -179,35 +181,38 @@ void InputPanel::DrawPreviewModal()
     ImGui::SetNextWindowSize(modalSize, ImGuiCond_Appearing);
 
     bool modalOpen = true;
-    if(ImGui::BeginPopupModal("ImagePreviewModal", &modalOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
+    if(ImGui::BeginPopupModal("ImagePreviewModal", &modalOpen, flags))
     {
-        if(previewSlotIndex < 0 || previewSlotIndex >= static_cast<int>(slots.size()) || !slots[previewSlotIndex].HasImage())
-        {
-            ImGui::TextUnformatted("No image available");
-        }
-        else
-        {
-            const ImageSlot& slot = slots[previewSlotIndex];
-            ImGui::TextUnformatted(slot.GetLabel().c_str());
-            if(slot.GetTextureId() != 0)
+            if(previewSlotIndex < 0 || previewSlotIndex >= static_cast<int>(slots.size()) || !slots[previewSlotIndex].HasImage())
             {
-                ImVec2 avail = ImGui::GetContentRegionAvail();
-                float maxEdge = std::min(avail.x, avail.y);
-                if(maxEdge <= 0.0f)
-                    maxEdge = std::min(modalSize.x, modalSize.y) - 40.0f;
-                float texW = static_cast<float>(slot.GetWidth());
-                float texH = static_cast<float>(slot.GetHeight());
-                float scale = 1.0f;
-                if(texW > maxEdge || texH > maxEdge)
-                {
-                    float scaleW = maxEdge / texW;
-                    float scaleH = maxEdge / texH;
-                    scale = std::min(scaleW, scaleH);
-                }
-                ImVec2 size(texW * scale, texH * scale);
-                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), size);
+                ImGui::TextUnformatted("No image available");
             }
-        }
+            else
+            {
+                const ImageSlot& slot = slots[previewSlotIndex];
+                ImGui::TextUnformatted(slot.GetLabel().c_str());
+                if(slot.GetTextureId() != 0)
+                {
+                    ImVec2 avail = ImGui::GetContentRegionAvail();
+                    if(avail.x <= 0.0f || avail.y <= 0.0f)
+                    {
+                        avail.x = modalSize.x - 40.0f;
+                        avail.y = modalSize.y - 80.0f;
+                    }
+                    float texW = static_cast<float>(slot.GetWidth());
+                    float texH = static_cast<float>(slot.GetHeight());
+                    float scaleW = avail.x / texW;
+                    float scaleH = avail.y / texH;
+                    float scale = std::min(scaleW, scaleH);
+                    if(scale > 1.0f)
+                        scale = 1.0f;
+                    if(scale <= 0.0f)
+                        scale = 1.0f;
+                    ImVec2 size(texW * scale, texH * scale);
+                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), size);
+                }
+            }
 
         if(ImGui::Button("Close"))
         {
