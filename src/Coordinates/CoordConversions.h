@@ -21,8 +21,8 @@ namespace EnvProj
             static T SideToConstVal(SkyboxSurf side);
     };
 
-    template class CoordConversions<float>;
-    template class CoordConversions<double>;
+    extern template class CoordConversions<float>;
+    extern template class CoordConversions<double>;
 }
 
 #endif

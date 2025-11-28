@@ -33,8 +33,8 @@ namespace EnvProj
         uint32_t sideVectorLength;
     };
 
-    template class CoordContainerSkybox<float>;
-    template class CoordContainerSkybox<double>;
+    extern template class CoordContainerSkybox<float>;
+    extern template class CoordContainerSkybox<double>;
 }
 
 #endif

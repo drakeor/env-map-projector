@@ -58,3 +58,5 @@ _deps
 *.out
 *.app
 output.txt
+
+vcpkg_installed/

@@ -187,7 +187,7 @@ void OutputPanel::DrawConvertedOutputs(GuiState& state)
         if(tex != 0)
         {
             ImVec2 previewSize = ComputeThumbnailSize(image.GetWidth(), image.GetHeight());
-            ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), previewSize);
+            ImGui::Image(static_cast<ImTextureID>(tex), previewSize);
             if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
                 outputPreviewIndex = static_cast<int>(i);
@@ -248,7 +248,7 @@ void OutputPanel::DrawOutputPreviewModal(GuiState& state)
                 if(scale <= 0.0f)
                     scale = 1.0f;
                 ImVec2 size(texW * scale, texH * scale);
-                ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(tex)), size);
+                ImGui::Image(static_cast<ImTextureID>(tex), size);
             }
         }
 

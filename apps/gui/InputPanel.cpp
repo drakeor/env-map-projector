@@ -93,7 +93,7 @@ void InputPanel::Draw(GuiState& state)
                 if(slot.GetTextureId() != 0)
                 {
                     ImVec2 previewSize = ComputeThumbnailSize(slot.GetWidth(), slot.GetHeight());
-                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), previewSize);
+                    ImGui::Image(static_cast<ImTextureID>(slot.GetTextureId()), previewSize);
                     if(ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                     {
                         previewSlotIndex = static_cast<int>(i);
@@ -219,7 +219,7 @@ void InputPanel::DrawPreviewModal()
                     if(scale <= 0.0f)
                         scale = 1.0f;
                     ImVec2 size(texW * scale, texH * scale);
-                    ImGui::Image(reinterpret_cast<void*>(static_cast<intptr_t>(slot.GetTextureId())), size);
+                    ImGui::Image(static_cast<ImTextureID>(slot.GetTextureId()), size);
                 }
             }
 

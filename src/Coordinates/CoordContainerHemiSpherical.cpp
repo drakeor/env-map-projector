@@ -168,4 +168,7 @@ uint32_t CoordContainerHemiSpherical<T>::GetClosestPixel(T x, T y, T z)
     return point;
 }
 
-
+namespace EnvProj {
+    template class CoordContainerHemiSpherical<float>;
+    template class CoordContainerHemiSpherical<double>;
+}

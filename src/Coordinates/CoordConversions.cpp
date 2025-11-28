@@ -96,3 +96,8 @@ T CoordConversions<T>::SideToConstVal(SkyboxSurf side)
 
     return 1.0f;
 }
+
+namespace EnvProj {
+    template class CoordConversions<float>;
+    template class CoordConversions<double>;
+}
