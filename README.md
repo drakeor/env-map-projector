@@ -1,6 +1,6 @@
 
 # Environment Map Projector
-[![Environment Map Projector](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml)
+[![Environment Map Projector](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml) [![CodeQL Advanced](https://github.com/drakeor/env-map-projector/actions/workflows/codeql.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/codeql.yml)
 
 Environment Map Projector is a free, cross-platform open-source program that allows users to convert (re-project) things like Skyboxes to Equirectangular format and vice-versa. It's mostly used for game engines and 3D renderers like Unity, Stride, Unreal Engine, etc.
 
