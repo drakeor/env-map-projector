@@ -241,4 +241,7 @@ uint32_t CoordContainerSkybox<T>::GetClosestPixel(T azim, T evel)
     return GetClosestPixel(point.x, point.y, point.z);
 }
 
-
+namespace EnvProj {
+    template class CoordContainerSkybox<float>;
+    template class CoordContainerSkybox<double>;
+}

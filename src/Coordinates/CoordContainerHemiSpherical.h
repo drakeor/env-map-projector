@@ -31,8 +31,8 @@ namespace EnvProj
         uint32_t vectorSize;
     };
 
-    template class CoordContainerHemiSpherical<float>;
-    template class CoordContainerHemiSpherical<double>;
+    extern template class CoordContainerHemiSpherical<float>;
+    extern template class CoordContainerHemiSpherical<double>;
 }
 
 #endif

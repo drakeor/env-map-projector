@@ -1,6 +1,6 @@
 
 # Environment Map Projector
-[![Environment Map Projector](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml) [![CodeQL Advanced](https://github.com/drakeor/env-map-projector/actions/workflows/codeql.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/codeql.yml)
+[![Environment Map Projector](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/drakeor/env-map-projector/actions/workflows/cmake-multi-platform.yml)
 
 Environment Map Projector is a free, cross-platform open-source program that allows users to convert (re-project) things like Skyboxes to Equirectangular format and vice-versa. It's mostly used for game engines and 3D renderers like Unity, Stride, Unreal Engine, etc.
 
@@ -109,12 +109,16 @@ Note this repository has a copy of all the libraries (with the version I used) i
 
 ### Building
 
-```
-cmake .
-make -j 8
+Configure, Build, Test, and Deploy with
+
+```bash
+cmake --prefix release
+cmake --build --prefix release
+ctest --prefix release --verbose
+cmake --install build/release --prefix install-output
 ```
 
-The executables will be under ```bin/``` following successful compilation.
+The executables will be under `install-output/bin/` following successful install.
 
 ## Libraries used:
 
@@ -125,8 +129,7 @@ The executables will be under ```bin/``` following successful compilation.
 * GLFW for rendering the front end: https://www.glfw.org
 * Portable File Dialogs for well, the file dialogs: https://github.com/samhocevar/portable-file-dialogs
 
-
-Note: I know the default convention is to either submodule them, use fetch content in CMake, or tell you to install them, but I've been burned by that when cloning other libraries before and it's annoying to fix.
+Note: These are provided by the [vcpkg](https://github.com/microsoft/vcpkg?tab=readme-ov-file#get-started) project which is a requirement to build on most build systems these days so you probably already have it (along with CMake of course).
 
 ## Credits:
 

@@ -109,4 +109,7 @@ uint32_t CoordContainerSpherical<T>::GetClosestPixel(T x, T y, T z)
     return GetClosestPixel(pointSphere.azimuth, pointSphere.elevation);
 }
 
-
+namespace EnvProj {
+    template class CoordContainerSpherical<float>;
+    template class CoordContainerSpherical<double>;
+}

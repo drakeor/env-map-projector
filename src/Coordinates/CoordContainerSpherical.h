@@ -31,8 +31,8 @@ namespace EnvProj
         uint32_t evelVectorSize;
     };
 
-    template class CoordContainerSpherical<float>;
-    template class CoordContainerSpherical<double>;
+    extern template class CoordContainerSpherical<float>;
+    extern template class CoordContainerSpherical<double>;
 }
 
 #endif
