@@ -110,11 +110,12 @@ jobs:
       shell: bash
       run: |
         pkg="envmapproj-${{ matrix.os }}-${{ matrix.build_type }}"
-        rm -rf "$pkg"
-        mkdir -p "$pkg"
-        cp -r assets "$pkg/"
-        cp -r "${{ steps.strings.outputs.build-output-dir }}/bin" "$pkg/"
-        tar -czf "$pkg.tar.gz" "$pkg"
+        bin_dir="${{ steps.strings.outputs.build-output-dir }}/bin"
+        if [ ! -d "$bin_dir" ]; then
+          echo "Expected bin directory at $bin_dir" >&2
+          exit 1
+        fi
+        tar -czf "$pkg.tar.gz" -C "$bin_dir" .
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
