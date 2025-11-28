@@ -18,12 +18,12 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
     SECTION( "loading all" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
-        auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
-        auto leftImg = reader.LoadImage("assets/skybox_test_small/left.png");
-        auto rightImg = reader.LoadImage("assets/skybox_test_small/right.png");
-        auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
-        auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
+        auto topImg = reader.LoadImage("assets/testimages/skybox_test_small/top.png");
+        auto bottomImg = reader.LoadImage("assets/testimages/skybox_test_small/bottom.png");
+        auto leftImg = reader.LoadImage("assets/testimages/skybox_test_small/left.png");
+        auto rightImg = reader.LoadImage("assets/testimages/skybox_test_small/right.png");
+        auto frontImg = reader.LoadImage("assets/testimages/skybox_test_small/front.png");
+        auto backImg = reader.LoadImage("assets/testimages/skybox_test_small/back.png");
 
         SkyboxProjection<float> proj;
         std::shared_ptr<CoordContainerBase<float>> coords = 
@@ -36,13 +36,12 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
     SECTION( "same size test" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
-        auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
-        auto leftImg = reader.LoadImage("assets/skybox_test_small/left.png");
-        auto rightImg = reader.LoadImage("assets/skybox_test_small/right.png");
-        auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
-        auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
-
+        auto topImg = reader.LoadImage("assets/testimages/skybox_test_small/top.png");
+        auto bottomImg = reader.LoadImage("assets/testimages/skybox_test_small/bottom.png");
+        auto leftImg = reader.LoadImage("assets/testimages/skybox_test_small/left.png");
+        auto rightImg = reader.LoadImage("assets/testimages/skybox_test_small/right.png");
+        auto frontImg = reader.LoadImage("assets/testimages/skybox_test_small/front.png");
+        auto backImg = reader.LoadImage("assets/testimages/skybox_test_small/back.png");
         SkyboxProjection<double> proj;
         std::shared_ptr<CoordContainerBase<double>> coords = 
             proj.LoadImageToSphericalCoords(
@@ -66,13 +65,12 @@ TEST_CASE( "SkyboxProjection", "[skybox-projection]" ) {
     SECTION( "upsize test" ) {
 
         ImageReader reader;
-        auto topImg = reader.LoadImage("assets/skybox_test_small/top.png");
-        auto bottomImg = reader.LoadImage("assets/skybox_test_small/bottom.png");
-        auto leftImg = reader.LoadImage("assets/skybox_test_small/left.png");
-        auto rightImg = reader.LoadImage("assets/skybox_test_small/right.png");
-        auto frontImg = reader.LoadImage("assets/skybox_test_small/front.png");
-        auto backImg = reader.LoadImage("assets/skybox_test_small/back.png");
-
+        auto topImg = reader.LoadImage("assets/testimages/skybox_test_small/top.png");
+        auto bottomImg = reader.LoadImage("assets/testimages/skybox_test_small/bottom.png");
+        auto leftImg = reader.LoadImage("assets/testimages/skybox_test_small/left.png");
+        auto rightImg = reader.LoadImage("assets/testimages/skybox_test_small/right.png");
+        auto frontImg = reader.LoadImage("assets/testimages/skybox_test_small/front.png");
+        auto backImg = reader.LoadImage("assets/testimages/skybox_test_small/back.png");
         SkyboxProjection<double> proj;
         std::shared_ptr<CoordContainerBase<double>> coords = 
             proj.LoadImageToSphericalCoords(

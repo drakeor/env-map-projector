@@ -25,7 +25,6 @@ namespace EnvProj
             LoadImageToSphericalCoords(EnvMapImage* topImage, EnvMapImage* bottomImage);
         std::array<EnvMapImage,2> ConvertToImages(CoordContainerBase<T>* coords,
             uint32_t imageSideLength);
-        //PointSphere<T> UVToSpherical(T u, T v);
 
     private:
     };

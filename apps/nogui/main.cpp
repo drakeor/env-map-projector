@@ -9,7 +9,6 @@ using namespace EnvProj;
 int main()
 {
     ImageReader reader;
-    //auto srcImg = reader.LoadImage("assets/testimages/8k_moon.jpg");
     auto srcImg = reader.LoadImage("assets/testimages/equirectangular_image.jpg");
 
     EquirectangularProjection<double> sourceProj;

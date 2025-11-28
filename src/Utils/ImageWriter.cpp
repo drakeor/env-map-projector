@@ -25,6 +25,4 @@ void ImageWriter::SaveImage(std::string fileName, EnvMapImage image)
 
     int res = stbi_write_png(fileName.c_str(), width, height, 
         channels, data.get(), stride_length);
-
-    //std::cout << "File write to " << fileName << " result: " << res << std::endl;
 }

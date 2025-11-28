@@ -98,7 +98,6 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
             static_cast<SkyboxSurf>(i));
         
         std::array<T, 3> tmpUvCoord = {0, 0, 0};
-        //Eigen::Vector3<T> tmpUvCoord(0, 0, 0);
 
         tmpUvCoord[0] = cartCoord[coordMap.x];
         tmpUvCoord[1] = cartCoord[coordMap.y];
@@ -111,20 +110,6 @@ uint32_t CoordContainerSkybox<T>::CartesianToIndex(T x, T y, T z)
             v = tmpUvCoord[1];
             break;
         }
-
-        /*
-        tmpUvCoord(0) = cartCoord(coordMap.x);
-        tmpUvCoord(1) = cartCoord(coordMap.y);
-        tmpUvCoord(2) = cartCoord(coordMap.z);
-
-        if(fabs(tmpUvCoord(2) - constVal) < epsilon)
-        {
-            sideIndex = i;
-            u = tmpUvCoord(0);
-            v = tmpUvCoord(1);
-            break;
-        }*/
-
     }
 
     // Convert domain of u,v from [-1,1] to [0,sideIndex]
