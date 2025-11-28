@@ -10,6 +10,8 @@
 #include "FileDialog.h"
 #include "Utils/ImageWriter.h"
 
+#define GL_CLAMP_TO_EDGE 0x812F
+
 namespace
 {
 constexpr float kThumbnailEdge = 220.0f;

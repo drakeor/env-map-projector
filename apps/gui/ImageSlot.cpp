@@ -6,6 +6,8 @@
 
 #include "Utils/ImageReader.h"
 
+#define GL_CLAMP_TO_EDGE 0x812F
+
 ImageSlot::ImageSlot(const std::string& _label)
     : label(_label), textureId(0)
 {
