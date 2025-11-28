@@ -69,7 +69,7 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         if [ "$RUNNER_OS" = "Windows" ]; then
-          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=${{ steps.vcpkg.outputs.vcpkgRoot }}/scripts/buildsystems/vcpkg.cmake" >> "$GITHUB_OUTPUT"
+          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=\"${VCPKG_ROOT//\\/\/}/scripts/buildsystems/vcpkg.cmake\"" >> "$GITHUB_OUTPUT"
         else
           echo "cmake-toolchain=" >> "$GITHUB_OUTPUT"
         fi
