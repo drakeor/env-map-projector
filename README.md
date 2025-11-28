@@ -112,9 +112,9 @@ Note this repository has a copy of all the libraries (with the version I used) i
 Configure, Build, Test, and Deploy with
 
 ```bash
-cmake --prefix release
-cmake --build --prefix release
-ctest --prefix release --verbose
+cmake --preset release
+cmake --build --preset release
+ctest --preset release --verbose
 cmake --install build/release --prefix install-output
 ```
 
