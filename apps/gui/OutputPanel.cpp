@@ -49,9 +49,15 @@ OutputPanel::~OutputPanel()
 void OutputPanel::Draw(GuiState& state, InputPanel& inputPanel, ConversionController& controller)
 {
     DrawProjectionSelector(state);
+
+    ImGui::SeparatorText("Output Options");
     DrawAutoScaleSelector(state);
     DrawOutputSettings(state);
+
+    ImGui::SeparatorText("Output Controls");
     DrawConversionControls(state, inputPanel, controller);
+
+    ImGui::SeparatorText("Output Previews");
     DrawConvertedOutputs(state);
 }
 
@@ -75,20 +81,38 @@ void OutputPanel::DrawOutputSettings(GuiState& state)
 {
     static const char* scaleLabels[] = {"1.0x", "2.0x", "4.0x"};
     static const float scaleValues[] = {1.0f, 2.0f, 4.0f};
-    state.uiScaleIndex = std::clamp(state.uiScaleIndex, 0, 2);
+    /*state.uiScaleIndex = std::clamp(state.uiScaleIndex, 0, 2);
     int scaleIndex = state.uiScaleIndex;
     if(ImGui::Combo("UI scale", &scaleIndex, scaleLabels, IM_ARRAYSIZE(scaleLabels)))
     {
         state.uiScaleIndex = scaleIndex;
     }
-    state.uiScale = scaleValues[state.uiScaleIndex];
+    state.uiScale = scaleValues[state.uiScaleIndex];*/
 
     if(ImGui::SliderFloat("Output scale", &state.outputScale, 0.5f, 4.0f, "%.1fx"))
     {
         state.outputScale = std::clamp(state.outputScale, 0.5f, 4.0f);
     }
 
-    ImGui::SeparatorText("Output size");
+    //ImGui::SameLine();
+    ImGui::InputText("Filename prefix", state.outputPrefix.data(), state.outputPrefix.size());
+
+    ImGui::InputText("Output directory", state.outputDirectory.data(), state.outputDirectory.size());
+
+    if(ImGui::Button("Browse##outputDir"))
+    {
+        std::string selected = FileDialog::SelectDirectory(state.outputDirectory.data());
+        if(!selected.empty())
+        {
+            std::snprintf(state.outputDirectory.data(), state.outputDirectory.size(), "%s", selected.c_str());
+        }
+    }
+}
+
+void OutputPanel::DrawConversionControls(GuiState& state, InputPanel& inputPanel, ConversionController& controller)
+{
+
+    // Display output size info
     if(state.outputProjection == ProjectionType::Equirectangular)
     {
         DrawSizeLabel("Width", state.outputEquirectWidth);
@@ -103,21 +127,6 @@ void OutputPanel::DrawOutputSettings(GuiState& state)
         DrawSizeLabel("Hemisphere size", state.outputHemisphericalSize);
     }
 
-    ImGui::InputText("Output directory", state.outputDirectory.data(), state.outputDirectory.size());
-    ImGui::SameLine();
-    if(ImGui::Button("Browse##outputDir"))
-    {
-        std::string selected = FileDialog::SelectDirectory(state.outputDirectory.data());
-        if(!selected.empty())
-        {
-            std::snprintf(state.outputDirectory.data(), state.outputDirectory.size(), "%s", selected.c_str());
-        }
-    }
-    ImGui::InputText("Filename prefix", state.outputPrefix.data(), state.outputPrefix.size());
-}
-
-void OutputPanel::DrawConversionControls(GuiState& state, InputPanel& inputPanel, ConversionController& controller)
-{
     if(ImGui::Button("Convert"))
     {
         if(!inputPanel.HasAllImages())

@@ -33,6 +33,8 @@ void InputPanel::Draw(GuiState& state)
 {
     DrawProjectionSelector(state);
 
+    ImGui::SeparatorText("Input Images");
+
     openPreviewThisFrame = false;
 
     for(size_t i = 0; i < slots.size(); ++i)

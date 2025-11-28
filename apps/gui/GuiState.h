@@ -37,7 +37,7 @@ struct GuiState
     int outputSkyboxSize = 0;
     int outputHemisphericalSize = 0;
 
-    std::array<char, 1024> outputDirectory = {"assets/testoutput"};
+    std::array<char, 1024> outputDirectory = {"output"};
     std::array<char, 256> outputPrefix = {"converted"};
 
     bool conversionInProgress = false;
