@@ -1,10 +1,16 @@
-cmake_minimum_required (VERSION 3.5.2)
+cmake_minimum_required (VERSION 3.10)
 
 project (EnvMapProjector)
 
 # Global output/config toggles
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS} -std=c++17")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT MSVC)
+    set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")
+endif()
 
 # Add Catch2 as a subdirectory for testing
 add_subdirectory(lib/catch2)
