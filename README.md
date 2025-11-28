@@ -118,7 +118,7 @@ ctest --prefix release --verbose
 cmake --install build/release --prefix install-output
 ```
 
-The executables will be under ```bin/``` following successful compilation.
+The executables will be under `install-output/bin/` following successful install.
 
 ## Libraries used:
 
