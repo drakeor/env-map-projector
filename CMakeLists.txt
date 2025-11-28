@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.2)
+cmake_minimum_required (VERSION 3.5.2)
 
 project (EnvMapProjector)
 
@@ -103,7 +103,6 @@ target_include_directories(envmapproj_gui PRIVATE
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
     ${PROJECT_SOURCE_DIR}/apps/gui
-    ${PROJECT_SOURCE_DIR}/lib/portable-file-dialogs
     ${GLFW_INCLUDE_DIRS}
 )
 
