@@ -1,5 +1,3 @@
-# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
-# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: Environment Map Projector
 
 permissions:
@@ -7,133 +5,140 @@ permissions:
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
     tags: [ "v*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
+
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 4
+  CTEST_OUTPUT_ON_FAILURE: 1
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
+  build-and-test:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    
     strategy:
-      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
-
-      # Set up a matrix to run the following 3 configurations:
-      # 1. <Windows, Release, latest MSVC compiler toolchain on the default runner image, default generator>
-      # 2. <Linux, Release, latest GCC compiler toolchain on the default runner image, default generator>
-      # 3. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
-      #
-      # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        c_compiler: [gcc, clang, cl]
-        include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
-          - os: ubuntu-latest
-            c_compiler: gcc
-            cpp_compiler: g++
-        exclude:
-          - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
+        config:
+          - name: "Ubuntu Latest (GCC)"
+            os: ubuntu-latest
+            preset: "release"
+            cc: "gcc"
+            cxx: "g++"
             
-    steps:
-    - uses: actions/checkout@v4
+          - name: "macOS Apple Silicon"
+            os: macos-latest
+            preset: "release"
+            cc: "clang"
+            cxx: "clang++"
+            
+          - name: "Windows Latest (MSVC)"
+            os: windows-latest
+            preset: "release"
+            cc: "cl"
+            cxx: "cl"
 
-    - name: Install dependencies (Linux)
-      if: runner.os == 'Linux'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Platform-specific dependency installation
+    - name: Install dependencies (Ubuntu)
+      if: matrix.config.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
         sudo apt-get install -y pkg-config libglfw3-dev libgl1-mesa-dev libglu1-mesa-dev
 
-    - name: Install GLFW via vcpkg (Windows)
-      if: runner.os == 'Windows'
-      id: vcpkg
+    - name: Install dependencies (macOS)
+      if: matrix.config.os == 'macos-latest'
+      run: |
+        brew install ninja pkg-config autoconf automake libtool
+
+    - name: Setup MSVC (Windows)
+      if: matrix.config.os == 'windows-latest'
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    # Cache vcpkg downloads and builds
+    - name: Cache vcpkg
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg-instance/downloads
+          ${{ github.workspace }}/vcpkg-instance/buildtrees
+          ${{ github.workspace }}/vcpkg-instance/packages
+          ${{ github.workspace }}/vcpkg-instance/installed
+        key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}-${{ hashFiles('vcpkg/triplets/**') }}
+        restore-keys: |
+          vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}-
+          vcpkg-${{ runner.os }}-
+
+    # Set up vcpkg
+    - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: ae8fa5ae5e6162a88e412618245809ed2aa579d9
-        runVcpkgInstall: true
-        vcpkgArguments: glfw3
-        vcpkgTriplet: x64-windows
-        vcpkgJsonGlob: '**/vcpkg.json'
+        vcpkgGitCommitId: 'ae8fa5ae5e6162a88e412618245809ed2aa579d9'
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg-instance'
 
-    - name: Set reusable strings
-      # Turn repeated input strings (such   as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
-      id: strings
+    # Configure CMake environment
+    - name: Set environment variables
       shell: bash
       run: |
-        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-        if [ "$RUNNER_OS" = "Windows" ]; then
-          if [ -z "$VCPKG_ROOT" ]; then
-            echo "VCPKG_ROOT is not defined; ensure run-vcpkg step executed." >&2
-            exit 1
-          fi
-          TOOLCHAIN_PATH="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-          TOOLCHAIN_PATH="${TOOLCHAIN_PATH//\\/\/}"
-          echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_PATH}" >> "$GITHUB_OUTPUT"
-        else
-          echo "cmake-toolchain=" >> "$GITHUB_OUTPUT"
-        fi
+        echo "CC=${{ matrix.config.cc }}" >> $GITHUB_ENV
+        echo "CXX=${{ matrix.config.cxx }}" >> $GITHUB_ENV
+        echo "VCPKG_ROOT=${{ github.workspace }}/vcpkg-instance" >> $GITHUB_ENV
 
+    # Cache build directory to speed up builds
+    - name: Cache build directory
+      uses: actions/cache@v4
+      with:
+        path: |
+          build
+          !build/**/vcpkg_installed
+        key: ${{ runner.os }}-${{ matrix.config.preset }}-${{ hashFiles('**/CMakeLists.txt', 'vcpkg.json', 'CMakePresets.json') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.config.preset }}-
+
+    # Configure project
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: >
-        cmake -B ${{ steps.strings.outputs.build-output-dir }}
-        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
-        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
-        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
-        ${{ steps.strings.outputs.cmake-toolchain }}
-        -S ${{ github.workspace }}
+      run: cmake --preset ${{ matrix.config.preset }}
 
+    # Build project
     - name: Build
-      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+      run: cmake --build --preset ${{ matrix.config.preset }}
 
-    - name: Test
-      working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest --build-config ${{ matrix.build_type }}
+    # Run tests
+    - name: Run tests
+      run: ctest --preset ${{ matrix.config.preset }} --verbose
 
-    - name: Package build outputs
+    # Install and create artifacts
+    - name: Install
       shell: bash
       run: |
-        pkg="envmapproj-${{ matrix.os }}-${{ matrix.build_type }}"
-        bin_dir="${{ steps.strings.outputs.build-output-dir }}/bin"
-        if [ ! -d "$bin_dir" ]; then
-          echo "Expected bin directory at $bin_dir" >&2
-          exit 1
+        # Extract build type from preset name (debug-linux -> debug)
+        BUILD_DIR="build/${{ matrix.config.preset }}"
+        
+        cmake --install "$BUILD_DIR" --prefix install-output
+
+    - name: Create artifact archive
+      shell: bash
+      run: |
+        cd install-output
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          7z a ../env-map-projector-${{ runner.os }}-${{ runner.arch }}.zip .
+        else
+          tar -czf ../env-map-projector-${{ runner.os }}-${{ runner.arch }}.tar.gz .
         fi
-        tar -czf "$pkg.tar.gz" -C "$bin_dir" .
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: envmapproj-${{ matrix.os }}-${{ matrix.build_type }}
-        path: envmapproj-${{ matrix.os }}-${{ matrix.build_type }}.tar.gz
-
-  release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/**/*.tar.gz
+        name: env-map-projector-${{ runner.os }}-${{ runner.arch }}
+        path: |
+          *.zip
+          *.tar.gz
+        retention-days: 7

@@ -17,6 +17,10 @@ find_package(Catch2 CONFIG REQUIRED)
 find_package(Eigen3 CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 
+# Include Catch2 module for test discovery
+include(CTest)
+include(Catch)
+
 # All reusable core sources live under src/
 set(SourceFiles 
     src/Coordinates/CoordConversions.cpp
@@ -60,6 +64,11 @@ add_executable (envmapproj_tests
 )
 target_link_libraries(envmapproj_tests PRIVATE envmapcore Catch2::Catch2WithMain)
 
+catch_discover_tests(envmapproj_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    PROPERTIES LABELS "unit"
+)
+
 # GUI dependencies
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
@@ -96,3 +105,12 @@ target_link_libraries(envmapproj PRIVATE envmapcore)
 
 # Add assets to the output directory
 file(COPY assets DESTINATION bin)
+
+# Install targets for the gui and nogui apps, along with assets
+install(TARGETS envmapproj_gui envmapproj
+    RUNTIME DESTINATION bin
+)
+install(TARGETS envmapproj
+    RUNTIME DESTINATION bin
+)
+install(DIRECTORY assets DESTINATION bin)

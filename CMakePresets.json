@@ -38,5 +38,29 @@
       "name": "release",
       "configurePreset": "release"
     }
+  ],
+  "testPresets": [
+    {
+        "name": "release",
+        "output": {
+            "outputOnFailure": true
+        },
+        "execution": {
+            "noTestsAction": "error",
+            "stopOnFailure": false
+        },
+        "configurePreset": "release"
+    },
+    {
+        "name": "debug",
+        "output": {
+            "outputOnFailure": true
+        },
+        "execution": {
+            "noTestsAction": "error",
+            "stopOnFailure": false
+        },
+        "configurePreset": "debug"
+    }
   ]
 }

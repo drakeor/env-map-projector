@@ -60,3 +60,4 @@ _deps
 output.txt
 
 vcpkg_installed/
+install-output/
