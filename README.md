@@ -129,7 +129,7 @@ The executables will be under `install-output/bin/` following successful install
 * GLFW for rendering the front end: https://www.glfw.org
 * Portable File Dialogs for well, the file dialogs: https://github.com/samhocevar/portable-file-dialogs
 
-Note: These are provided by the `vcpkg` project which is a requirement to build on most build systems these days so you probably already have it (along with CMake of course).
+Note: These are provided by the [vcpkg](https://github.com/microsoft/vcpkg?tab=readme-ov-file#get-started) project which is a requirement to build on most build systems these days so you probably already have it (along with CMake of course).
 
 ## Credits:
 
