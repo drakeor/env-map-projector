@@ -39,7 +39,7 @@ jobs:
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
-            c_compiler: cl
+            c_compiler: clang
     steps:
     - uses: actions/checkout@v4
 
@@ -58,12 +58,6 @@ jobs:
         vcpkgArguments: glfw3
         vcpkgTriplet: x64-windows
 
-    - name: Cache vcpkg root path
-      if: runner.os == 'Windows'
-      shell: bash
-      run: |
-        echo "VCPKG_ROOT=${{ steps.vcpkg.outputs.vcpkgRoot }}" >> "$GITHUB_ENV"
-
     - name: Set reusable strings
       # Turn repeated input strings (such   as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
       id: strings
@@ -71,6 +65,10 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         if [ "$RUNNER_OS" = "Windows" ]; then
+          if [ -z "$VCPKG_ROOT" ]; then
+            echo "VCPKG_ROOT is not defined; ensure run-vcpkg step executed." >&2
+            exit 1
+          fi
           TOOLCHAIN_PATH="${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
           TOOLCHAIN_PATH="${TOOLCHAIN_PATH//\\/\/}"
           echo "cmake-toolchain=-DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_PATH}" >> "$GITHUB_OUTPUT"
