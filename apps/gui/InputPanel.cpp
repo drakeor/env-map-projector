@@ -146,6 +146,13 @@ void InputPanel::DrawProjectionSelector(GuiState& state)
             RebuildSlots(currentProjection);
         }
     }
+
+    if(state.inputProjection == ProjectionType::Hemispherical)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.95f, 0.6f, 0.1f, 1.0f));
+        ImGui::TextWrapped("Warning: Hemispherical conversion is experimental and may introduce visible artifacts in output images.");
+        ImGui::PopStyleColor();
+    }
 }
 
 void InputPanel::RebuildSlots(ProjectionType type)

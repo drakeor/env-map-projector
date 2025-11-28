@@ -1,6 +1,7 @@
 #ifndef OUTPUT_PANEL_H
 #define OUTPUT_PANEL_H
 
+#include <string>
 #include <vector>
 
 #include <imgui.h>
@@ -24,7 +25,8 @@ private:
     void DrawOutputSettings(GuiState& state);
     void DrawConvertedOutputs(GuiState& state);
     void DrawOutputPreviewModal(GuiState& state);
-    void SaveOutputs(GuiState& state);
+    void DrawSaveOutputsModal();
+    bool SaveOutputs(GuiState& state, std::string& savedDirectory);
     void RebuildOutputTextures(GuiState& state);
     void ReleaseOutputTextures();
 
@@ -33,6 +35,9 @@ private:
     bool outputPreviewOpen;
     int outputPreviewIndex;
     bool openOutputPreviewThisFrame;
+    bool saveOutputsModalOpen;
+    bool openSaveOutputsModalThisFrame;
+    std::string lastSavedDirectory;
 };
 
 #endif

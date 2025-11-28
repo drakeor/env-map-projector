@@ -88,7 +88,7 @@ void GuiApp::Run()
         ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
             ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-        ImGui::Begin("EnvMapProjector", nullptr, windowFlags);
+        ImGui::Begin("Env Map Projector", nullptr, windowFlags);
         ImVec2 content = ImGui::GetContentRegionAvail();
         float leftWidth = std::max(320.0f, content.x * 0.4f);
 

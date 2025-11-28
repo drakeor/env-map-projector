@@ -37,7 +37,8 @@ void DrawSizeLabel(const char* label, int value)
 }
 
 OutputPanel::OutputPanel()
-    : cachedGeneration(0), outputPreviewOpen(false), outputPreviewIndex(-1), openOutputPreviewThisFrame(false)
+    : cachedGeneration(0), outputPreviewOpen(false), outputPreviewIndex(-1), openOutputPreviewThisFrame(false),
+      saveOutputsModalOpen(false), openSaveOutputsModalThisFrame(false)
 {
 }
 
@@ -48,6 +49,7 @@ OutputPanel::~OutputPanel()
 
 void OutputPanel::Draw(GuiState& state, InputPanel& inputPanel, ConversionController& controller)
 {
+    openSaveOutputsModalThisFrame = false;
     DrawProjectionSelector(state);
 
     ImGui::SeparatorText("Output Options");
@@ -59,6 +61,8 @@ void OutputPanel::Draw(GuiState& state, InputPanel& inputPanel, ConversionContro
 
     ImGui::SeparatorText("Output Previews");
     DrawConvertedOutputs(state);
+
+    DrawSaveOutputsModal();
 }
 
 void OutputPanel::DrawProjectionSelector(GuiState& state)
@@ -81,13 +85,13 @@ void OutputPanel::DrawOutputSettings(GuiState& state)
 {
     static const char* scaleLabels[] = {"1.0x", "2.0x", "4.0x"};
     static const float scaleValues[] = {1.0f, 2.0f, 4.0f};
-    /*state.uiScaleIndex = std::clamp(state.uiScaleIndex, 0, 2);
+    state.uiScaleIndex = std::clamp(state.uiScaleIndex, 0, 2);
     int scaleIndex = state.uiScaleIndex;
     if(ImGui::Combo("UI scale", &scaleIndex, scaleLabels, IM_ARRAYSIZE(scaleLabels)))
     {
         state.uiScaleIndex = scaleIndex;
     }
-    state.uiScale = scaleValues[state.uiScaleIndex];*/
+    state.uiScale = scaleValues[state.uiScaleIndex];
 
     if(ImGui::SliderFloat("Output scale", &state.outputScale, 0.5f, 4.0f, "%.1fx"))
     {
@@ -141,14 +145,22 @@ void OutputPanel::DrawConversionControls(GuiState& state, InputPanel& inputPanel
     ImGui::SameLine();
     if(ImGui::Button("Save outputs"))
     {
-        SaveOutputs(state);
+        std::string savedDir;
+        if(SaveOutputs(state, savedDir))
+        {
+            lastSavedDirectory = savedDir;
+            saveOutputsModalOpen = true;
+            openSaveOutputsModalThisFrame = true;
+        }
     }
 
     ImGui::ProgressBar(state.conversionProgress, ImVec2(-1.0f, 0.0f));
 
     if(!state.statusText.empty())
     {
-        ImGui::TextUnformatted(state.statusText.c_str());
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.1f, 0.95f, 0.75f, 1.0f));
+        ImGui::TextWrapped("%s", state.statusText.c_str());
+        ImGui::PopStyleColor();
     }
 }
 
@@ -252,22 +264,61 @@ void OutputPanel::DrawOutputPreviewModal(GuiState& state)
     }
 }
 
-void OutputPanel::SaveOutputs(GuiState& state)
+void OutputPanel::DrawSaveOutputsModal()
 {
+    if(openSaveOutputsModalThisFrame)
+    {
+        ImGui::OpenPopup("OutputsSavedModal");
+    }
+
+    if(!saveOutputsModalOpen)
+        return;
+
+    bool modalOpen = true;
+    if(ImGui::BeginPopupModal("OutputsSavedModal", &modalOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if(lastSavedDirectory.empty())
+        {
+            ImGui::TextUnformatted("Outputs saved.");
+        }
+        else
+        {
+            ImGui::Text("Outputs saved to:\n%s", lastSavedDirectory.c_str());
+        }
+
+        if(ImGui::Button("OK"))
+        {
+            ImGui::CloseCurrentPopup();
+            modalOpen = false;
+        }
+        ImGui::EndPopup();
+    }
+
+    if(!modalOpen)
+    {
+        saveOutputsModalOpen = false;
+    }
+}
+
+bool OutputPanel::SaveOutputs(GuiState& state, std::string& savedDirectory)
+{
+    savedDirectory.clear();
     if(state.convertedImages.empty())
     {
         state.statusText = "Nothing to save";
-        return;
+        return false;
     }
 
     std::string directory(state.outputDirectory.data());
     if(directory.empty())
     {
         state.statusText = "Specify output directory";
-        return;
+        return false;
     }
 
-    std::filesystem::create_directories(directory);
+    std::filesystem::path outputPath(directory);
+    std::error_code ec;
+    std::filesystem::create_directories(outputPath, ec);
 
     ImageWriter writer;
     std::string prefix(state.outputPrefix.data());
@@ -275,11 +326,13 @@ void OutputPanel::SaveOutputs(GuiState& state)
         prefix = "converted";
     for(size_t i = 0; i < state.convertedImages.size(); ++i)
     {
-        std::string filename = directory + "/" + prefix + "_" + state.convertedLabels[i] + ".png";
-        writer.SaveImage(filename, state.convertedImages[i]);
+        std::filesystem::path filename = outputPath / (prefix + "_" + state.convertedLabels[i] + ".png");
+        writer.SaveImage(filename.string(), state.convertedImages[i]);
     }
 
-    state.statusText = "Saved outputs";
+    savedDirectory = std::filesystem::absolute(outputPath).string();
+    state.statusText = "Saved outputs to " + savedDirectory;
+    return true;
 }
 
 void OutputPanel::RebuildOutputTextures(GuiState& state)
