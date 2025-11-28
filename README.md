@@ -109,9 +109,13 @@ Note this repository has a copy of all the libraries (with the version I used) i
 
 ### Building
 
-```
-cmake .
-make -j 8
+Configure, Build, Test, and Deploy with
+
+```bash
+cmake --prefix release
+cmake --build --prefix release
+ctest --prefix release --verbose
+cmake --install build/release --prefix install-output
 ```
 
 The executables will be under ```bin/``` following successful compilation.
