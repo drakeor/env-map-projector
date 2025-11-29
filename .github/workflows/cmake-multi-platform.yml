@@ -141,3 +141,22 @@ jobs:
           *.zip
           *.tar.gz
         retention-days: 7
+
+  release:
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.gz
+          draft: false
+          prerelease: false
